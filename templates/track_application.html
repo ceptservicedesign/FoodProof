@@ -30,6 +30,7 @@
 
     <!-- ── Tab: Application Status ── -->
     <div class="track-tab-panel active" id="tab-status">
+      <div id="trackFlagNotifications"></div>
       <div class="track-timeline" id="trackTimeline">
         <div style="color:var(--text-muted);font-size:13px;">Loading…</div>
       </div>
@@ -53,10 +54,56 @@
 
     <!-- ── Tab: FoSTaC Training ── -->
     <div class="track-tab-panel" id="tab-fostac">
-      <div class="track-placeholder-panel">
-        <div class="big-icon">🎓</div>
-        <div class="title">FoSTaC Training</div>
-        <div class="sub">Food Safety Training and Certification (FoSTaC) is required for businesses with five or more employees. Enrol through the FSSAI-approved training partner portal.</div>
+      <div class="track-fostac-card">
+
+        <div class="track-fostac-header">
+          <div class="track-fostac-icon">🎓</div>
+          <div>
+            <h3 class="track-fostac-title">FoSTaC Training</h3>
+            <p class="track-fostac-sub">Food Safety Training and Certification (FoSTaC) is a mandatory programme for food businesses with five or more employees. Courses are approved and supervised by FSSAI.</p>
+          </div>
+        </div>
+
+        <div class="track-fostac-meta-grid">
+          <div class="track-fostac-meta-item">
+            <div class="track-fostac-meta-label">Duration</div>
+            <div class="track-fostac-meta-val">8 hours (1 day)</div>
+          </div>
+          <div class="track-fostac-meta-item">
+            <div class="track-fostac-meta-label">Format</div>
+            <div class="track-fostac-meta-val">In-person or Online</div>
+          </div>
+          <div class="track-fostac-meta-item">
+            <div class="track-fostac-meta-label">Certificate Valid</div>
+            <div class="track-fostac-meta-val">3 years</div>
+          </div>
+          <div class="track-fostac-meta-item">
+            <div class="track-fostac-meta-label">Languages</div>
+            <div class="track-fostac-meta-val">Hindi, English + 9 regional</div>
+          </div>
+        </div>
+
+        <div class="track-fostac-actions">
+          <div class="track-fostac-action-box">
+            <div class="track-fostac-action-title">Enrol in FoSTaC Training</div>
+            <p class="track-fostac-action-desc">Register through an FSSAI-approved Training Partner. Choose your preferred language and delivery format — online or classroom.</p>
+            <button class="fbo-btn-primary track-fostac-btn" id="fostacEnrolBtn">Register for Training →</button>
+            <div class="track-fostac-success-msg" id="fostacEnrolSuccess" style="display:none;">✓ Enrolment request submitted. Confirmation will be sent to your registered number within 2 working days.</div>
+          </div>
+
+          <div class="track-fostac-divider-or">or</div>
+
+          <div class="track-fostac-action-box">
+            <div class="track-fostac-action-title">Already have a FoSTaC certificate?</div>
+            <p class="track-fostac-action-desc">Upload your existing certificate to update your compliance record and attach it to this application.</p>
+            <label class="fbo-btn-secondary track-fostac-btn" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;">
+              ⬆ Upload Certificate
+              <input type="file" id="fostacCertInput" accept="image/*,.pdf" style="display:none;" />
+            </label>
+            <div class="track-fostac-success-msg" id="fostacUploadSuccess" style="display:none;">✓ Certificate uploaded and added to your application.</div>
+          </div>
+        </div>
+
       </div>
     </div>
 

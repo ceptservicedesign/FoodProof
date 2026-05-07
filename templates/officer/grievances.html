@@ -1,0 +1,48 @@
+{% extends "officer/_base.html" %}
+
+{% block title %}Grievances — FOSCOS Officer Portal{% endblock %}
+{% block nav_grievances %}active{% endblock %}
+
+{% block content %}
+<div class="officer-page-header">
+  <div>
+    <h1 class="officer-page-title">Consumer Grievances</h1>
+    <p class="officer-page-sub">All complaints filed by consumers against licensed FBOs in your jurisdiction.</p>
+  </div>
+</div>
+
+<!-- ── Status filter tabs ── -->
+<div class="officer-grv-tabs" id="grvTabs">
+  <button class="officer-grv-tab active" data-status="all">All <span id="grvCountAll" class="officer-grv-tab-count"></span></button>
+  <button class="officer-grv-tab" data-status="Submitted">Submitted <span id="grvCountSubmitted" class="officer-grv-tab-count"></span></button>
+  <button class="officer-grv-tab" data-status="Under Review">Under Review <span id="grvCountReview" class="officer-grv-tab-count"></span></button>
+  <button class="officer-grv-tab" data-status="Inspection Scheduled">Inspection Scheduled <span id="grvCountInspection" class="officer-grv-tab-count"></span></button>
+  <button class="officer-grv-tab" data-status="Action Taken">Action Taken <span id="grvCountDone" class="officer-grv-tab-count"></span></button>
+  <button class="officer-grv-tab" data-status="Resolved">Resolved <span id="grvCountResolved" class="officer-grv-tab-count"></span></button>
+</div>
+
+<!-- ── Table ── -->
+<div class="officer-table-wrap">
+  <table class="officer-table" id="grvTable">
+    <thead>
+      <tr>
+        <th>Filed</th>
+        <th>Restaurant</th>
+        <th>Category</th>
+        <th>Overall</th>
+        <th>Consumer</th>
+        <th>Comment</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="grvBody">
+      <tr><td colspan="8" class="officer-table-loading">Loading…</td></tr>
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/officer_grievances.js') }}"></script>
+{% endblock %}

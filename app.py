@@ -213,6 +213,61 @@ def officer_application_detail(app_id):
 def officer_temp_licenses():
     return render_template('officer/temp_licenses.html')
 
+@app.route('/officer/fbo-directory')
+def officer_fbo_directory():
+    return render_template('officer/fbo_directory.html')
+
+@app.route('/officer/fbo-directory/<fbo_id>')
+def officer_fbo_profile(fbo_id):
+    return render_template('officer/fbo_profile.html', fbo_id=fbo_id)
+
+@app.route('/officer/inspections')
+def officer_inspections():
+    return render_template('officer/inspections.html')
+
+@app.route('/officer/inspections/regulatory/<app_id>')
+def officer_inspection_regulatory(app_id):
+    return render_template('officer/inspection_detail.html', inspection_type='regulatory', inspection_id=app_id)
+
+@app.route('/officer/inspections/surveillance/<grv_id>')
+def officer_inspection_surveillance(grv_id):
+    return render_template('officer/inspection_detail.html', inspection_type='surveillance', inspection_id=grv_id)
+
+@app.route('/officer/sampling')
+def officer_sampling():
+    return render_template('officer/sampling.html')
+
+@app.route('/officer/clean-kitchen-league')
+def officer_ckl():
+    return render_template('officer/clean_kitchen_league.html')
+
+@app.route('/officer/profile')
+def officer_profile():
+    return render_template('officer/profile.html')
+
+@app.route('/officer/grievances')
+def officer_grievances():
+    return render_template('officer/grievances.html')
+
+@app.route('/officer/grievances/<grv_id>')
+def officer_grievance_detail(grv_id):
+    return render_template('officer/grievance_detail.html', grv_id=grv_id)
+
+@app.route('/modify-license')
+def modify_license():
+    return render_template('modify_license.html')
+
+@app.route('/fbo-grievances')
+def fbo_grievances():
+    return render_template('fbo_grievances.html')
+
+@app.route('/fbo-grievances/<grv_id>')
+def fbo_grievance_detail(grv_id):
+    return render_template('fbo_grievance_detail.html', grv_id=grv_id)
+
+@app.route('/grievance')
+def grievance():
+    return render_template('grievance.html')
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)

@@ -31,14 +31,43 @@
   function show(id) { var el = document.getElementById(id); if (el) el.style.display = ''; }
   function hide(id) { var el = document.getElementById(id); if (el) el.style.display = 'none'; }
 
-  // ── Header: Skip / Continue buttons ──────────────────────────
+  // ── Tab activation helper ─────────────────────────────────────
+  function activateTab(name) {
+    document.querySelectorAll('.oss-tab').forEach(function (t) { t.classList.remove('active'); });
+    document.querySelectorAll('.oss-panel').forEach(function (p) { p.classList.remove('active'); });
+    var tab = document.querySelector('.oss-tab[data-tab="' + name + '"]');
+    if (tab) tab.classList.add('active');
+    var panel = document.getElementById('panel' + capitalize(name));
+    if (panel) panel.classList.add('active');
+  }
+
+  // ── Header: Skip / Continue buttons + reg-flow nav ──────────
   function initHeader() {
     var actions = document.getElementById('ossHeaderActions');
-    if (!actions) return;
+    var navRow  = document.getElementById('ossNavRow');
+
     if (fromDocuments) {
-      actions.innerHTML =
-        '<a href="/review" class="oss-skip-btn">Skip for now</a>' +
-        '<a href="/review" class="oss-continue-btn" id="ossContinueBtn">Continue to Review →</a>';
+      if (actions) {
+        actions.innerHTML =
+          '<a href="/review" class="oss-skip-btn">Skip for now</a>' +
+          '<a href="/review" class="oss-continue-btn" id="ossContinueBtn">Continue to Review →</a>';
+      }
+
+      var regNav = document.getElementById('ossRegNav');
+      if (regNav) {
+        regNav.style.display = '';
+        var page = document.getElementById('ossPage');
+        if (page) page.classList.add('oss-page--reg-flow');
+      }
+
+      if (navRow) navRow.style.display = '';
+    } else {
+      if (navRow) {
+        navRow.innerHTML =
+          '<a href="/fbo-portal" class="oss-page-header__back-link">← Back to Dashboard</a>' +
+          '<a href="/" class="oss-page-header__home-link">🏠 Home</a>';
+        navRow.style.display = '';
+      }
     }
   }
 
@@ -409,6 +438,32 @@
     }, { merge: true }).catch(function (e) { console.error('[FOSCOS] OSS save cart:', e); });
   }
 
+  // ── FOSTAC tab buttons ────────────────────────────────────────
+  function initFostac() {
+    var enrolBtn = document.getElementById('ossEnrolFostacBtn');
+    if (enrolBtn) {
+      enrolBtn.addEventListener('click', function () {
+        enrolBtn.disabled    = true;
+        enrolBtn.textContent = 'Submitting…';
+        setTimeout(function () {
+          enrolBtn.style.display = 'none';
+          var success = document.getElementById('ossEnrolFostacSuccess');
+          if (success) success.style.display = '';
+        }, 800);
+      });
+    }
+
+    var certInput = document.getElementById('ossFostacCertInput');
+    if (certInput) {
+      certInput.addEventListener('change', function () {
+        var file = certInput.files[0];
+        if (!file) return;
+        var success = document.getElementById('ossFostacUploadSuccess');
+        if (success) success.style.display = '';
+      });
+    }
+  }
+
   // ── Review & Pay button ───────────────────────────────────────
   function initReviewPayBtn() {
     var btn = document.getElementById('ossReviewPayBtn');
@@ -438,6 +493,7 @@
     initBookingModal();
     initKit();
     initHygieneModal();
+    initFostac();
     initReviewPayBtn();
   });
 
@@ -446,6 +502,12 @@
       if (user) {
         setAuthState(true);
         loadCart();
+        firebase.firestore().collection('users').doc(user.uid).get().then(function (doc) {
+          var d = doc.exists ? doc.data() : {};
+          if (d.documents && d.documents.waterTestReport) {
+            activateTab('medical');
+          }
+        }).catch(function () {});
       } else {
         setAuthState(false);
       }

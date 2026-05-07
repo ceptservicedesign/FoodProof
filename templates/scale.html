@@ -48,7 +48,7 @@
           <p class="reg-section-label" style="margin-top:20px;">Days you operate per week</p>
           <div class="reg-scale-field">
             <div class="reg-scale-input-row">
-              <input type="number" id="daysPerWeekInput" min="1" max="7" value="6" inputmode="numeric"
+              <input type="number" id="daysPerWeekInput" min="1" max="7" placeholder="e.g. 6" inputmode="numeric"
                 style="border-radius:10px; border-left:1.5px solid #d4cec4;" />
               <span style="font-size:13px;color:var(--text-muted);white-space:nowrap;">days / week</span>
               <button class="reg-mic-btn" title="Voice input (coming soon)">🎙️</button>
@@ -58,7 +58,7 @@
           <p class="reg-section-label" style="margin-top:20px;">Active months per year</p>
           <div class="reg-scale-field">
             <div class="reg-scale-input-row">
-              <input type="number" id="monthsPerYear" placeholder="12" min="1" max="12" value="12" inputmode="numeric"
+              <input type="number" id="monthsPerYear" placeholder="e.g. 12" min="1" max="12" inputmode="numeric"
                 style="border-radius:10px; border-left:1.5px solid #d4cec4;" />
               <span style="font-size:13px;color:var(--text-muted);white-space:nowrap;">months / year</span>
             </div>
@@ -82,8 +82,8 @@
 
           <!-- Temp license callout -->
           <div class="reg-temp-panel" id="tempPanel" style="display:none;">
-            <div class="reg-temp-panel__title">✋ You qualify for Temporary / Basic Registration</div>
-            <p class="reg-temp-panel__sub">Your turnover is below ₹10 Lakh — this qualifies for a basic registration at no fee. No physical inspection needed.</p>
+            <div class="reg-temp-panel__title">✋ You qualify for Temporary Registration</div>
+            <p class="reg-temp-panel__sub">Your turnover is below ₹10 Lakh — this qualifies for Temporary Registration at no fee. No physical inspection needed.</p>
             <div class="reg-temp-panel__btns">
               <button class="reg-btn-outline" id="btnTempLicense">Get Basic License →</button>
               <button class="reg-btn-outline" id="btnTempLearnMore">Learn More</button>
@@ -94,7 +94,7 @@
           <div class="reg-tiers-glance" id="tiersGlance" style="display:none;">
             <p class="reg-tier-heading">License Tiers at a Glance</p>
             <div class="reg-tier-row" id="tier-basic">
-              <span>Temporary / Basic Registration</span>
+              <span>Temporary Registration</span>
               <span class="tier-fee">₹0 / yr &nbsp;·&nbsp; &lt;₹10 L</span>
             </div>
             <div class="reg-tier-row" id="tier-state-basic">
@@ -110,12 +110,12 @@
               <span class="tier-fee">₹7,500 / yr &nbsp;·&nbsp; &gt;₹20 Cr</span>
             </div>
           </div>
-        </div>
 
-        <p class="reg-error" id="scaleError"></p>
-        <button class="reg-btn-cta" id="scaleContinueBtn" style="margin-top:20px;width:100%;">
-          Let's proceed with the license →
-        </button>
+          <p class="reg-error" id="scaleError" style="margin-top:20px;margin-bottom:0;"></p>
+          <button class="reg-btn-cta" id="scaleContinueBtn" style="margin-top:12px;width:100%;">
+            Let's proceed with the license →
+          </button>
+        </div>
       </div>
 
     </div>

@@ -164,6 +164,23 @@
 .login-btn-cta:hover:not(:disabled) { background: var(--amber-hover); transform: translateY(-1px); }
 .login-btn-cta:disabled { background: #c8b99a; cursor: not-allowed; transform: none; }
 
+/* ── Secondary button (navy outline) ────────────────────────── */
+.login-btn-secondary {
+  width: 100%;
+  background: #fff;
+  color: var(--navy);
+  border: 1.5px solid var(--navy);
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: background .15s;
+  margin-bottom: 8px;
+}
+.login-btn-secondary:hover { background: var(--cream); }
+
 /* ── Card footer text ────────────────────────────────────────── */
 .login-form-footer {
   text-align: center;
@@ -276,7 +293,7 @@
 }
 
 .help-modal__logo-img {
-  height: 48px; width: auto;
+  height: 58px; width: auto;
 }
 
 .help-modal__title {
@@ -339,6 +356,23 @@
 }
 
 .help-option__arrow { color: var(--text-muted); font-size: 18px; flex-shrink: 0; }
+
+/* ── FBO sub-menu back button ────────────────────────────── */
+.help-sub-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0 0 14px 0;
+  transition: color .15s;
+}
+.help-sub-back:hover { color: var(--navy); }
 
 /* ═══════════════════════════════════════════════════════════════
    LOGGED-IN NAVBAR — user avatar + dropdown

@@ -1,22 +1,47 @@
 {% extends "_base.html" %}
 {% block title %}One Stop Shop &mdash; FOSCOS{% endblock %}
 {% block extra_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/registration.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/one_stop_shop.css') }}?v=1" />
 {% endblock %}
 
 {% block content %}
 <div class="oss-page" id="ossPage">
 
+  <!-- ── Progress stepper (registration flow only) ── -->
+  <div id="ossRegNav" style="display:none;">
+    <div class="reg-stepper">
+      <div class="reg-stepper__inner">
+        <div class="reg-stepper__step">Profile</div>
+        <div class="reg-stepper__step">Details</div>
+        <div class="reg-stepper__step">Documents</div>
+        <div class="reg-stepper__step active">One Stop Shop</div>
+        <div class="reg-stepper__step">Review</div>
+      </div>
+    </div>
+  </div>
+
   <!-- ── Page header ── -->
   <div class="oss-page-header">
     <div class="oss-page-header__inner">
-      <div>
-        <h1 class="oss-page-title">One Stop Shop</h1>
-        <p class="oss-page-sub">Everything your food business needs to stay compliant &mdash; in one place.</p>
+
+      <!-- Back / Home nav row — shown only when ?from=documents -->
+      <div id="ossNavRow" class="oss-page-header__nav-row" style="display:none;">
+        <a href="/documents" class="oss-page-header__back-link">← Back to Documents</a>
+        <a href="/" class="oss-page-header__home-link">🏠 Home</a>
       </div>
-      <div id="ossHeaderActions" class="oss-header-actions">
-        <!-- Skip / Continue injected by JS based on ?from=documents -->
+
+      <!-- Title + actions row -->
+      <div class="oss-page-header__main-row">
+        <div>
+          <h1 class="oss-page-title">One Stop Shop</h1>
+          <p class="oss-page-sub">Everything your food business needs to stay compliant &mdash; in one place.</p>
+        </div>
+        <div id="ossHeaderActions" class="oss-header-actions">
+          <!-- Skip / Continue injected by JS based on ?from=documents -->
+        </div>
       </div>
+
     </div>
   </div>
 
@@ -33,6 +58,7 @@
       <button class="oss-tab active" data-tab="water">&#128167; Water Testing</button>
       <button class="oss-tab" data-tab="medical">&#127973; Medical Certificate</button>
       <button class="oss-tab" data-tab="fire">&#128293; Fire Safety</button>
+      <button class="oss-tab" data-tab="fostac">&#127891; FoSTaC Training</button>
       <button class="oss-tab" data-tab="kit">&#129514; Testing Kit</button>
       <button class="oss-tab" data-tab="manual">&#128218; User Manual</button>
       <button class="oss-tab" data-tab="hygiene">&#9989; Hygiene Check</button>
@@ -284,7 +310,62 @@
       </div>
     </div>
 
-    <!-- ══ TAB 4: TESTING KIT ══ -->
+    <!-- ══ TAB 4: FOSTAC TRAINING ══ -->
+    <div class="oss-panel" id="panelFostac">
+      <div class="oss-panel-header">
+        <div>
+          <h2 class="oss-panel-title">FoSTaC Training</h2>
+          <p class="oss-panel-sub">Food Safety Training and Certification (FoSTaC) is an FSSAI-approved programme for food handlers and business operators. Mandatory for businesses with five or more employees.</p>
+        </div>
+      </div>
+
+      <div class="oss-info-strip">
+        <span class="oss-info-strip__icon">&#127891;</span>
+        <span>Certificate valid for 3 years. Available in Hindi, English and 9 regional languages &mdash; online or in-person. Issued by FSSAI-approved Training Partners.</span>
+      </div>
+
+      <div class="oss-fostac-meta-grid">
+        <div class="oss-fostac-meta-item">
+          <div class="oss-fostac-meta-label">Duration</div>
+          <div class="oss-fostac-meta-val">8 hours (1 day)</div>
+        </div>
+        <div class="oss-fostac-meta-item">
+          <div class="oss-fostac-meta-label">Format</div>
+          <div class="oss-fostac-meta-val">In-person or Online</div>
+        </div>
+        <div class="oss-fostac-meta-item">
+          <div class="oss-fostac-meta-label">Certificate Valid</div>
+          <div class="oss-fostac-meta-val">3 years</div>
+        </div>
+        <div class="oss-fostac-meta-item">
+          <div class="oss-fostac-meta-label">Typical Fee</div>
+          <div class="oss-fostac-meta-val">&#8377;500 &ndash; &#8377;1,500</div>
+        </div>
+      </div>
+
+      <div class="oss-fostac-actions">
+        <div class="oss-fostac-action-box">
+          <div class="oss-fostac-action-title">Enrol in FoSTaC Training</div>
+          <p class="oss-fostac-action-desc">Register through an FSSAI-approved Training Partner. Choose your preferred language and delivery format &mdash; online or classroom.</p>
+          <button class="oss-fostac-btn" id="ossEnrolFostacBtn">Register for Training &rarr;</button>
+          <div class="oss-fostac-success" id="ossEnrolFostacSuccess" style="display:none;">&#10003; Enrolment request submitted. Confirmation will be sent to your registered number within 2 working days.</div>
+        </div>
+
+        <div class="oss-fostac-divider">or</div>
+
+        <div class="oss-fostac-action-box">
+          <div class="oss-fostac-action-title">Already have a certificate?</div>
+          <p class="oss-fostac-action-desc">Upload your existing FoSTaC certificate to attach it to your application and update your compliance record.</p>
+          <label class="oss-fostac-upload-btn">
+            &#11015;&#65039; Upload Certificate
+            <input type="file" id="ossFostacCertInput" accept="image/*,.pdf" style="display:none;" />
+          </label>
+          <div class="oss-fostac-success" id="ossFostacUploadSuccess" style="display:none;">&#10003; Certificate uploaded and added to your application.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TAB 5: TESTING KIT (formerly 4) ══ -->
     <div class="oss-panel" id="panelKit">
       <div class="oss-panel-header">
         <div>
@@ -369,10 +450,6 @@
           <button class="oss-manual-tab" data-module="spices">
             <span class="oss-manual-tab__icon">&#127798;&#65039;</span>
             <span>Spices &amp; Tea</span>
-          </button>
-          <button class="oss-manual-tab" data-module="oils">
-            <span class="oss-manual-tab__icon">&#129379;</span>
-            <span>Cooking Oils</span>
           </button>
         </nav>
 
@@ -636,91 +713,6 @@
               </div>
             </div>
             <div class="oss-fssai-note"><strong>FSSAI Standard:</strong> FSSR 2011 &mdash; Part A, Regulation 2.9: Spices and Condiments. Iron filings are classified as a metallic contaminant and are strictly prohibited.</div>
-          </div>
-
-          <!-- MODULE 6: OILS -->
-          <div class="oss-module" id="moduleOils">
-            <div class="oss-module-header">
-              <h3 class="oss-module-title">Module 6 &mdash; Cooking Oils</h3>
-              <p class="oss-module-question">Is the cooking oil adulterated with solid fat or starch?</p>
-              <button class="oss-video-btn">&#9654;&#65039; Watch Video Guide</button>
-            </div>
-
-            <div class="oss-test-block">
-              <div class="oss-test-block__num">Test 1 of 2</div>
-              <h4 class="oss-test-block__title">Detecting Solid Fat (Vanaspati) in Cooking Oil</h4>
-              <div class="oss-module-section">
-                <h4 class="oss-module-section-title">Equipment Needed</h4>
-                <div class="oss-equipment-list">
-                  <span class="oss-equip-tag">Glass Plate</span>
-                  <span class="oss-equip-tag">Refrigerator or bowl of ice water</span>
-                  <span class="oss-equip-tag">Cooking oil sample</span>
-                </div>
-              </div>
-              <div class="oss-module-section">
-                <h4 class="oss-module-section-title">Procedure</h4>
-                <ol class="oss-procedure-list">
-                  <li>Place a few drops of the cooking oil on the glass plate.</li>
-                  <li>Place the glass plate in a refrigerator for <strong>2 hours</strong>, or hold it above a bowl of ice water for <strong>20 minutes</strong>.</li>
-                  <li>Remove and observe the oil without disturbing it.</li>
-                </ol>
-              </div>
-              <div class="oss-module-section">
-                <h4 class="oss-module-section-title">What to Look For</h4>
-                <div class="oss-result-grid">
-                  <div class="oss-result-card oss-result-card--safe">
-                    <div class="oss-result-card__label">&#10003; Pure</div>
-                    <div class="oss-result-card__param">Remains liquid or slightly hazy</div>
-                    <p>Pure vegetable oils (sunflower, groundnut, soybean) stay liquid or become slightly viscous when cold. This is normal.</p>
-                  </div>
-                  <div class="oss-result-card oss-result-card--fail">
-                    <div class="oss-result-card__label">&#10005; Adulterated</div>
-                    <div class="oss-result-card__param">Solidifies or turns grainy white</div>
-                    <p>Vanaspati (hydrogenated vegetable fat) or solid fat has been added. Do not use or sell.</p>
-                  </div>
-                </div>
-              </div>
-              <div class="oss-module-note">&#9888; <strong>Note:</strong> Coconut oil naturally solidifies below 25&deg;C. Do not apply this test to coconut oil &mdash; it will always produce a false positive.</div>
-            </div>
-
-            <div class="oss-test-block">
-              <div class="oss-test-block__num">Test 2 of 2</div>
-              <h4 class="oss-test-block__title">Detecting Starch in Flavoured or Coconut Oil</h4>
-              <div class="oss-module-section">
-                <h4 class="oss-module-section-title">Equipment Needed</h4>
-                <div class="oss-equipment-list">
-                  <span class="oss-equip-tag">Glass Beaker</span>
-                  <span class="oss-equip-tag">Dropper</span>
-                  <span class="oss-equip-tag">Iodine Solution (1%)</span>
-                  <span class="oss-equip-tag">Oil sample and water</span>
-                </div>
-              </div>
-              <div class="oss-module-section">
-                <h4 class="oss-module-section-title">Procedure</h4>
-                <ol class="oss-procedure-list">
-                  <li>Add 1 ml of oil to 5 ml of water in the glass beaker. Stir vigorously for 10 seconds.</li>
-                  <li>Using the dropper, add <strong>2 &ndash; 3 drops of 1% iodine solution</strong> to the mixture.</li>
-                  <li>Allow the oil and water to separate, then observe the colour in the water layer only.</li>
-                </ol>
-              </div>
-              <div class="oss-module-section">
-                <h4 class="oss-module-section-title">What to Look For</h4>
-                <div class="oss-result-grid">
-                  <div class="oss-result-card oss-result-card--safe">
-                    <div class="oss-result-card__label">&#10003; Pure</div>
-                    <div class="oss-result-card__param">Water layer: pale amber</div>
-                    <p>Water layer remains pale yellow or amber (the natural colour of diluted iodine). No starch present in the oil.</p>
-                  </div>
-                  <div class="oss-result-card oss-result-card--fail">
-                    <div class="oss-result-card__label">&#10005; Adulterated</div>
-                    <div class="oss-result-card__param">Water layer: blue or blue-black</div>
-                    <p>Starch or flour paste added to increase viscosity &mdash; particularly found in adulterated coconut and flavoured oils. Do not sell.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="oss-fssai-note"><strong>FSSAI Standard:</strong> FSSR 2011 &mdash; Part A, Regulation 2.2: Edible Fats and Oils. Addition of vanaspati to refined vegetable oils without labelling declaration is prohibited. Starch adulteration is prohibited under all circumstances.</div>
           </div>
 
         </div><!-- .oss-manual-content -->

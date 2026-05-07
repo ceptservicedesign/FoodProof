@@ -1,0 +1,52 @@
+{% extends "_base.html" %}
+
+{% block title %}Consumer Complaints — FOSCOS{% endblock %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/fbo_portal.css') }}" />
+{% endblock %}
+
+{% block content %}
+<div class="fbo-page">
+
+  <!-- ── Header ── -->
+  <div class="fbo-header">
+    <div class="fbo-header__inner">
+      <div>
+        <a href="/fbo-portal" class="track-header__back">← Back to Portal</a>
+        <div class="fbo-header__greeting">Consumer Complaints</div>
+        <div class="fbo-header__sub">Complaints filed against your business by consumers</div>
+      </div>
+      <div class="fbo-header__license-chip">
+        <span class="label">Restaurant ID</span>
+        <span class="value" id="grvRestaurantId">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Content ── -->
+  <div class="fbo-content">
+
+    <!-- Loading -->
+    <div id="grvLoading" style="text-align:center;padding:60px 0;color:var(--text-muted);">
+      Loading complaints…
+    </div>
+
+    <!-- Empty state -->
+    <div id="grvEmpty" style="display:none;">
+      <div class="fbo-grv-empty-state">
+        <div class="fbo-grv-empty-state__icon">✅</div>
+        <div class="fbo-grv-empty-state__title">No Complaints Filed</div>
+        <div class="fbo-grv-empty-state__sub">No consumer complaints have been filed against your business yet.</div>
+      </div>
+    </div>
+
+    <!-- Complaint list -->
+    <div id="grvList" style="display:none;max-width:800px;"></div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/fbo_grievances.js') }}"></script>
+{% endblock %}

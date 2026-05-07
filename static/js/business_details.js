@@ -119,22 +119,23 @@
     var user = firebase.auth().currentUser;
     if (!user) return;
 
-    var phone = user.phoneNumber || '';
-    var phoneInput = document.getElementById('bizPhone');
-    if (phoneInput && phone && !phoneInput.value) {
-      phoneInput.value = phone.replace(/^\+91/, '').trim();
-    }
-
     firebase.firestore().collection('users').doc(user.uid).get().then(function (doc) {
       if (!doc.exists) return;
-      var d = doc.data().details;
+      var docData = doc.data();
+      var d = docData.details;
+
+      var ppEl = document.getElementById('personPhone');
+      if (ppEl && !ppEl.value && docData.phone) {
+        ppEl.value = docData.phone.replace(/^\+91/, '').trim();
+      }
+
       if (!d) return;
 
       setValue('bizName',         d.bizName);
       setValue('ownerName',       d.ownerName);
       setValue('bizPhone',        d.bizPhone);
       setValue('personInCharge',  d.personInCharge);
-      setValue('personPhone',     d.personPhone);
+      if (d.personPhone) setValue('personPhone', d.personPhone);
       if (d.idProofType) {
         setValue('idProofType', d.idProofType);
         applyIdConfig(d.idProofType);

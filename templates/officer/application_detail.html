@@ -16,7 +16,7 @@
     <button class="officer-btn-approve" id="btnApprove">✓ Approve</button>
     <button class="officer-btn-flag" id="btnFlag">⚑ Flag</button>
     <button class="officer-btn-return" id="btnReturn">↩ Return</button>
-    <a href="/officer/applications" class="officer-btn-return" style="text-decoration:none;">← All Applications</a>
+    <a href="/officer/applications" class="officer-btn-return" style="text-decoration:none;">← New Applications</a>
   </div>
 </div>
 
@@ -43,6 +43,8 @@
       <button class="officer-tab" data-tab="documents">Documents</button>
       <button class="officer-tab" data-tab="audit">Audit Trail</button>
       <button class="officer-tab" data-tab="flags">Flags</button>
+      <button class="officer-tab" data-tab="inspection">Inspection</button>
+      <button class="officer-tab" data-tab="grievances">Grievances <span class="officer-grv-tab-count" id="detailGrvCount" style="background:#e2e8f0;color:var(--navy);margin-left:4px"></span></button>
     </div>
 
     <div class="officer-tab-panel active" id="tabBusiness">
@@ -66,6 +68,18 @@
     <div class="officer-tab-panel" id="tabFlags">
       <div class="officer-flags-list" id="flagsList">
         <div class="officer-info-loading">No flags raised.</div>
+      </div>
+    </div>
+
+    <div class="officer-tab-panel" id="tabInspection">
+      <div id="inspectionPanel">
+        <div class="officer-info-loading">Loading…</div>
+      </div>
+    </div>
+
+    <div class="officer-tab-panel" id="tabGrievances">
+      <div id="detailGrvList">
+        <div class="officer-info-loading">Loading grievances…</div>
       </div>
     </div>
   </div>

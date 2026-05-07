@@ -1,6 +1,3 @@
-/* ============================================================
-   FBO_PORTAL.JS — P23 Dashboard: pending or approved state
-   ============================================================ */
 (function () {
   'use strict';
 
@@ -22,13 +19,17 @@
     if (el) el.textContent = val || '—';
   }
 
+  /* ── Pending display ─────────────────────────────────────── */
+
   function showPending(d) {
     document.getElementById('fboLoadingView').style.display  = 'none';
     document.getElementById('fboApprovedView').style.display = 'none';
     document.getElementById('fboPendingView').style.display  = '';
 
     var name = (d.details && d.details.bizName) || 'Applicant';
-    setText('pendingGreeting',   'Hi ' + name.split(' ')[0] + ' — Application Under Review');
+    var docsRequested = d.applicationStatus === 'documents_requested';
+
+    setText('pendingGreeting',   'Hi ' + name.split(' ')[0] + (docsRequested ? ' — Action Required' : ' — Application Under Review'));
     setText('pendingAppId',      d.applicationId);
     setText('pendingAppIdBadge', d.applicationId);
     setText('hist-appId',        d.applicationId);
@@ -43,20 +44,38 @@
     };
     setText('hist-status', statusMap[d.applicationStatus] || 'Under Review');
 
-    setText('pend-bizName',    d.details && d.details.bizName);
+    setText('pend-bizName',     d.details && d.details.bizName);
     setText('pend-licenseType', TIER_LABELS[d.scale && d.scale.tier] || '—');
     var years = d.review && d.review.years;
     setText('pend-duration', years ? years + (years === 1 ? ' Year' : ' Years') : '—');
     var fee = d.review && d.review.totalFee;
     setText('pend-fee', fee !== undefined ? '₹' + fee.toLocaleString('en-IN') : '—');
 
+    if (docsRequested) {
+      var iconEl  = document.querySelector('#fboPendingView .fbo-status-banner__icon');
+      var titleEl = document.querySelector('#fboPendingView .fbo-status-banner__title');
+      var subEl   = document.querySelector('#fboPendingView .fbo-status-banner__sub');
+      if (iconEl)  iconEl.textContent  = '📄';
+      if (titleEl) titleEl.textContent = 'Action required — additional documents requested';
+      if (subEl) {
+        subEl.textContent = d.lastOfficerNote
+          ? 'Officer note: "' + d.lastOfficerNote + '". Please update your details and documents, then resubmit.'
+          : 'FSSAI officers have requested additional information. Please update your details and documents, then resubmit.';
+      }
+    }
+
     var trackBtn = document.getElementById('pendingTrackBtn');
     if (trackBtn) {
-      trackBtn.addEventListener('click', function () {
-        window.location.href = '/track-application';
-      });
+      if (docsRequested) {
+        trackBtn.textContent = 'Update & Resubmit →';
+        trackBtn.addEventListener('click', function () { window.location.href = '/modify-license'; });
+      } else {
+        trackBtn.addEventListener('click', function () { window.location.href = '/track-application'; });
+      }
     }
   }
+
+  /* ── Approved display ────────────────────────────────────── */
 
   function showApproved(d) {
     document.getElementById('fboLoadingView').style.display  = 'none';
@@ -87,6 +106,8 @@
       }));
     }
   }
+
+  /* ── Boot ────────────────────────────────────────────────── */
 
   document.addEventListener('firebase-ready', function () {
     firebase.auth().onAuthStateChanged(function (user) {

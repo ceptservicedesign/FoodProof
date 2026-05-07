@@ -16,7 +16,6 @@
   var STATUS_ORDER = PIPELINE_STEPS.map(function (s) { return s.key; });
 
   var DOC_NAMES = {
-    selfie:          'Photo of Applicant',
     idProof:         'Identity Proof',
     addressProof:    'Address Proof',
     form9:           'Form IX',
@@ -36,6 +35,31 @@
         if (panel) panel.classList.add('active');
       });
     });
+  }
+
+  // ── Render flag notifications ────────────────────────────────
+  function renderFlagNotifications(appData) {
+    var container = document.getElementById('trackFlagNotifications');
+    if (!container) return;
+    var flags = appData.flags || [];
+    if (!flags.length) { container.innerHTML = ''; return; }
+
+    container.innerHTML = flags.map(function (f) {
+      var title = f.issueType || 'Application Flagged';
+      var ts    = f.timestamp
+        ? new Date(f.timestamp).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+        : '';
+      return '<div class="track-flag-notif">' +
+        '<div class="track-flag-notif__icon">&#9888;&#65039;</div>' +
+        '<div class="track-flag-notif__body">' +
+          '<div class="track-flag-notif__title">Issue flagged: ' + title +
+            (ts ? ' &middot; ' + ts : '') + '</div>' +
+          (f.priority ? '<div class="track-flag-notif__meta">Priority: ' + f.priority + '</div>' : '') +
+          (f.note ? '<div class="track-flag-notif__msg">' + f.note + '</div>' : '') +
+          '<div class="track-flag-notif__action">Please review your application. If you need to provide additional information, use the Update &amp; Resubmit option below or contact your FSSAI officer.</div>' +
+        '</div>' +
+        '</div>';
+    }).join('');
   }
 
   // ── Render Application Status timeline ───────────────────────
@@ -91,38 +115,126 @@
     });
   }
 
+  // ── Upload row factory ────────────────────────────────────────
+  function makeUploadRow(docKey) {
+    var wrap = document.createElement('div');
+    wrap.className = 'track-doc-upload';
+
+    var btn = document.createElement('span');
+    btn.className = 'track-doc-upload__btn';
+    btn.textContent = '⬆ Upload';
+
+    var input = document.createElement('input');
+    input.type   = 'file';
+    input.accept = 'image/*,.pdf';
+    input.style.display = 'none';
+
+    var successEl = document.createElement('span');
+    successEl.className     = 'track-doc-upload__success';
+    successEl.style.display = 'none';
+    successEl.textContent   = '✓ Uploaded successfully';
+
+    btn.addEventListener('click', function () { input.click(); });
+
+    (function (sEl) {
+      input.addEventListener('change', function () {
+        if (!input.files[0]) return;
+        sEl.style.display = '';
+        var user = firebase.auth().currentUser;
+        if (!user) return;
+        var update = { documents: {} };
+        update.documents[docKey] = true;
+        firebase.firestore().collection('users').doc(user.uid)
+          .set(update, { merge: true }).catch(function () {});
+      });
+    })(successEl);
+
+    wrap.appendChild(btn);
+    wrap.appendChild(input);
+    wrap.appendChild(successEl);
+    return wrap;
+  }
+
   // ── Render Document Processing tab ───────────────────────────
   function renderDocProcessing(appData) {
     var container = document.getElementById('trackDocGrid');
     if (!container) return;
 
-    var docs = appData.documents || {};
-    var keys = Object.keys(DOC_NAMES);
-
-    if (!keys.length) {
-      container.innerHTML = '<div style="color:var(--text-muted);">No documents on record.</div>';
-      return;
-    }
+    var docs      = appData.documents || {};
+    var ossCart   = (appData.ossCart && appData.ossCart.items) ? appData.ossCart.items : [];
 
     container.innerHTML = '';
-    keys.forEach(function (key) {
-      var val   = docs[key];
-      var name  = DOC_NAMES[key];
-      if (!val) return;
+    var hasAny = false;
 
-      var badgeClass = 'track-badge--pending';
-      var badgeText  = 'Submitted';
-
+    // Submitted docs
+    Object.keys(DOC_NAMES).forEach(function (key) {
+      if (!docs[key]) return;
+      hasAny = true;
       var item = document.createElement('div');
       item.className = 'track-doc-item';
       item.innerHTML =
-        '<span class="track-doc-item__name">' + name + '</span>' +
-        '<span class="track-badge ' + badgeClass + '">' + badgeText + '</span>';
+        '<span class="track-doc-item__name">' + DOC_NAMES[key] + '</span>' +
+        '<span class="track-badge track-badge--verified">Submitted</span>';
       container.appendChild(item);
     });
 
-    if (!container.children.length) {
-      container.innerHTML = '<div style="color:var(--text-muted);">No documents uploaded yet.</div>';
+    // Scheduled water test bookings
+    var waterBooked = ossCart.filter(function (i) { return i.id && i.id.indexOf('water-') === 0; });
+    waterBooked.forEach(function (booking) {
+      if (docs.waterTestReport) return;
+      hasAny = true;
+      var dateStr = booking.date
+        ? new Date(booking.date + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
+        : '';
+      var item = document.createElement('div');
+      item.className = 'track-doc-item';
+      item.innerHTML =
+        '<span class="track-doc-item__name">Water Analysis Report' +
+          '<span class="track-doc-item__sub">' +
+            (booking.name || '') +
+            (dateStr ? ' &middot; ' + dateStr : '') +
+            (booking.time ? ' at ' + booking.time : '') +
+          '</span></span>' +
+        '<span class="track-badge track-badge--scheduled">Scheduled</span>';
+      container.appendChild(item);
+      container.appendChild(makeUploadRow('waterTestReport'));
+    });
+
+    // Scheduled medical cert bookings
+    var medBooked = ossCart.filter(function (i) { return i.id && i.id.indexOf('medical-') === 0; });
+    medBooked.forEach(function (booking) {
+      hasAny = true;
+      var dateStr = booking.date
+        ? new Date(booking.date + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
+        : '';
+      var item = document.createElement('div');
+      item.className = 'track-doc-item';
+      item.innerHTML =
+        '<span class="track-doc-item__name">Medical Certificate' +
+          '<span class="track-doc-item__sub">' +
+            (booking.name || '') +
+            (dateStr ? ' &middot; ' + dateStr : '') +
+            (booking.time ? ' at ' + booking.time : '') +
+          '</span></span>' +
+        '<span class="track-badge track-badge--scheduled">Scheduled</span>';
+      container.appendChild(item);
+      container.appendChild(makeUploadRow('medicalCert'));
+    });
+
+    // Pending water test (not submitted, not scheduled via OSS)
+    if (!docs.waterTestReport && !waterBooked.length) {
+      hasAny = true;
+      var pendItem = document.createElement('div');
+      pendItem.className = 'track-doc-item';
+      pendItem.innerHTML =
+        '<span class="track-doc-item__name">Water Analysis Report</span>' +
+        '<span class="track-badge track-badge--missing">Pending</span>';
+      container.appendChild(pendItem);
+      container.appendChild(makeUploadRow('waterTestReport'));
+    }
+
+    if (!hasAny) {
+      container.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">No documents on record.</div>';
     }
   }
 
@@ -177,6 +289,7 @@
 
       firebase.firestore().collection('applications').doc(appId).get().then(function (appDoc) {
         var appData = appDoc.exists ? appDoc.data() : d;
+        renderFlagNotifications(appData);
         renderTimeline(appData);
         renderDocProcessing(appData);
         renderInspection(appData);
@@ -199,6 +312,32 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     setupTabs();
+
+    var enrolBtn = document.getElementById('fostacEnrolBtn');
+    if (enrolBtn) {
+      enrolBtn.addEventListener('click', function () {
+        enrolBtn.disabled    = true;
+        enrolBtn.textContent = 'Submitting…';
+        setTimeout(function () {
+          enrolBtn.style.display = 'none';
+          var success = document.getElementById('fostacEnrolSuccess');
+          if (success) success.style.display = '';
+        }, 800);
+      });
+    }
+
+    var certInput = document.getElementById('fostacCertInput');
+    if (certInput) {
+      certInput.addEventListener('change', function () {
+        var file = certInput.files[0];
+        if (!file) return;
+        var success = document.getElementById('fostacUploadSuccess');
+        if (success) {
+          success.textContent = '✓ ' + file.name + ' uploaded and added to your application.';
+          success.style.display = '';
+        }
+      });
+    }
   });
 
 })();

@@ -6,7 +6,7 @@
   <title>{% block title %}FOSCOS Officer Portal{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/officer_portal.css') }}?v=2" />
   {% block extra_css %}{% endblock %}
 </head>
@@ -15,8 +15,11 @@
   <!-- ── Sidebar ── -->
   <aside class="officer-sidebar" id="officerSidebar">
     <div class="officer-sidebar__brand">
-      <img src="{{ url_for('static', filename='images/fssai_logo.png') }}" alt="FSSAI" class="officer-sidebar__logo-img" />
-      <span class="officer-sidebar__brand-sub">Officer Portal</span>
+      <img src="{{ url_for('static', filename='images/foodproof_logo.png') }}?v=2" alt="FOODPROOF" class="officer-sidebar__logo-img" />
+      <div class="officer-sidebar__brand-text">
+        <div class="officer-sidebar__brand-name">FOODPROOF</div>
+        <span class="officer-sidebar__brand-sub">Officer Portal</span>
+      </div>
     </div>
 
     <nav class="officer-sidebar__nav">
@@ -26,11 +29,6 @@
       <a href="/officer/dashboard" class="officer-nav-link {% block nav_dashboard %}{% endblock %}">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         Dashboard
-      </a>
-      <a href="/officer/applications" class="officer-nav-link {% block nav_myqueue %}{% endblock %}">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        My Queue
-        <span class="officer-nav__badge" id="sidebarQueueBadge" style="display:none;"></span>
       </a>
 
       <!-- FBO MANAGEMENT -->
@@ -45,45 +43,41 @@
         Temp Licenses
         <span class="officer-nav__badge" id="sidebarTlBadge" style="display:none;"></span>
       </a>
-      <a href="#" class="officer-nav-link">
+      <a href="/officer/fbo-directory" class="officer-nav-link {% block nav_fbo_directory %}{% endblock %}">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         FBO Directory
+        <span class="officer-nav__badge" id="sidebarFboBadge" style="display:none;"></span>
       </a>
 
       <!-- COMPLIANCE -->
       <span class="officer-sidebar__section-label">Compliance</span>
-      <a href="#" class="officer-nav-link">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-        Routine Monitoring
-        <span class="officer-nav__badge">3</span>
+      <a href="/officer/sampling" class="officer-nav-link {% block nav_sampling %}{% endblock %}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></svg>
+        Sampling
       </a>
-      <a href="#" class="officer-nav-link">
+      <a href="/officer/inspections" class="officer-nav-link {% block nav_inspections %}{% endblock %}">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         Inspections
       </a>
 
       <!-- ESCALATIONS -->
       <span class="officer-sidebar__section-label">Escalations</span>
-      <a href="#" class="officer-nav-link">
+      <a href="/officer/grievances" class="officer-nav-link {% block nav_grievances %}{% endblock %}">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         Grievances
-        <span class="officer-nav__badge">1</span>
+        <span class="officer-nav__badge" id="sidebarGrvBadge" style="display:none;"></span>
       </a>
 
       <!-- INSIGHTS -->
       <span class="officer-sidebar__section-label">Insights</span>
-      <a href="#" class="officer-nav-link">
+      <a href="/officer/clean-kitchen-league" class="officer-nav-link {% block nav_ckl %}{% endblock %}">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         Clean Kitchen League
-      </a>
-      <a href="#" class="officer-nav-link">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-        Reports
       </a>
 
       <!-- ACCOUNT -->
       <span class="officer-sidebar__section-label">Account</span>
-      <a href="#" class="officer-nav-link">
+      <a href="/officer/profile" class="officer-nav-link {% block nav_profile %}{% endblock %}">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
         Settings &amp; Profile
       </a>

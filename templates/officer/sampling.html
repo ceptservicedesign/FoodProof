@@ -1,0 +1,88 @@
+{% extends "officer/_base.html" %}
+{% block title %}Sampling — FOSCOS Officer Portal{% endblock %}
+{% block nav_sampling %}active{% endblock %}
+
+{% block content %}
+<div class="officer-page-header">
+  <div>
+    <h1 class="officer-page-title">Sampling</h1>
+    <p class="officer-page-sub">Record food samples collected for lab testing</p>
+  </div>
+</div>
+
+<div class="officer-detail-layout">
+
+  <!-- Left: Record new sample form -->
+  <div class="officer-card" style="padding:28px;">
+    <h2 class="officer-card__title" style="margin-bottom:20px;">New Sample Record</h2>
+
+    <div class="officer-modal__field">
+      <label>FBO / Restaurant Name</label>
+      <input type="text" id="smpFboInput" placeholder="Type to search registered FBOs…"
+        style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13.5px;font-family:inherit;" />
+      <div id="smpFboDropdown" style="display:none;border:1.5px solid var(--border);border-top:none;border-radius:0 0 8px 8px;background:var(--white);max-height:180px;overflow-y:auto;font-size:13px;"></div>
+      <input type="hidden" id="smpFboId" />
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="officer-modal__field">
+        <label>Sample Category</label>
+        <select id="smpCategory" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13.5px;font-family:inherit;">
+          <option value="">Select category…</option>
+          <option value="packaged_food">Packaged Food</option>
+          <option value="raw_material">Raw Material</option>
+          <option value="cooked_food">Cooked / Ready-to-Eat</option>
+          <option value="beverages">Beverages</option>
+          <option value="dairy">Dairy Products</option>
+          <option value="oil_fat">Oils &amp; Fats</option>
+          <option value="spices">Spices &amp; Condiments</option>
+          <option value="water">Water / Ice</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="officer-modal__field">
+        <label>Sample Collected</label>
+        <input type="text" id="smpItem" placeholder="e.g. Paneer, Mustard Oil…"
+          style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13.5px;font-family:inherit;" />
+      </div>
+      <div class="officer-modal__field">
+        <label>Quantity Collected</label>
+        <input type="text" id="smpQty" placeholder="e.g. 500g, 1 litre…"
+          style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13.5px;font-family:inherit;" />
+      </div>
+      <div class="officer-modal__field">
+        <label>Date &amp; Time of Collection</label>
+        <input type="datetime-local" id="smpDateTime"
+          style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13.5px;font-family:inherit;" />
+      </div>
+    </div>
+
+    <div class="officer-modal__field">
+      <label>Pre-Lab Notes</label>
+      <textarea id="smpNotes" rows="3" placeholder="Observations at the time of collection, storage conditions, seal details…"
+        style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13.5px;font-family:inherit;resize:vertical;"></textarea>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:14px;margin-top:8px;">
+      <button class="officer-modal__confirm" id="smpSubmitBtn">Record Sample</button>
+      <span id="smpSavedMsg" style="font-size:13px;color:#16a34a;font-weight:600;display:none;">✔ Sample recorded</span>
+      <p class="officer-modal__error" id="smpError" style="margin:0;"></p>
+    </div>
+  </div>
+
+  <!-- Right: Recent samples -->
+  <div>
+    <div class="officer-card officer-status-card">
+      <h3 class="officer-actions-card__title" style="margin-bottom:16px;">Recent Samples</h3>
+      <div id="smpRecentList">
+        <div class="officer-info-loading">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/officer_sampling.js') }}"></script>
+{% endblock %}

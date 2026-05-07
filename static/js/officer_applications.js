@@ -139,7 +139,8 @@
     setupSort();
 
     firebase.firestore().collection('applications').get().then(function (snap) {
-      allApps = snap.docs.map(function (d) { return d.data(); });
+      allApps = snap.docs.map(function (d) { return d.data(); })
+        .filter(function (a) { return a.applicationStatus !== 'approved'; });
       renderTable();
     }).catch(function (err) {
       console.error('[FOSCOS] applications load:', err);

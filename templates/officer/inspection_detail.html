@@ -1,0 +1,81 @@
+{% extends "officer/_base.html" %}
+{% block title %}Inspection Detail — FOSCOS Officer Portal{% endblock %}
+{% block nav_inspections %}active{% endblock %}
+
+{% block content %}
+<div class="officer-page-header" style="margin-bottom:16px;">
+  <div>
+    <a href="/officer/inspections" class="officer-btn-return" style="text-decoration:none;display:inline-block;margin-bottom:8px;">← Back to Inspections</a>
+    <h1 class="officer-page-title" id="inspDtlTitle">Loading…</h1>
+    <p class="officer-page-sub" id="inspDtlSub">—</p>
+  </div>
+  <span class="officer-date-badge" id="inspDtlTypeBadge">—</span>
+</div>
+
+<div class="officer-detail-layout">
+
+  <!-- Left column: Inspection details + linked record -->
+  <div>
+
+    <!-- Inspection details card -->
+    <div class="officer-card" style="margin-bottom:20px;">
+      <div class="officer-card__header">
+        <h2 class="officer-card__title">Inspection Details</h2>
+        <span id="inspDtlStatusBadge"></span>
+      </div>
+      <div class="officer-info-grid" id="inspDtlGrid">
+        <div class="officer-info-loading">Loading…</div>
+      </div>
+
+      <!-- Notes / comments section -->
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);display:none;" id="inspDtlNotesSection">
+        <div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:6px;">Inspection Notes</div>
+        <div id="inspDtlNotes" style="font-size:13.5px;color:var(--text-body);white-space:pre-wrap;line-height:1.6;">—</div>
+      </div>
+    </div>
+
+    <!-- Linked record card -->
+    <div class="officer-card">
+      <div class="officer-card__header">
+        <h2 class="officer-card__title" id="inspDtlLinkTitle">Linked Record</h2>
+      </div>
+      <div id="inspDtlLinkContent">
+        <div class="officer-info-loading">Loading…</div>
+      </div>
+      <div style="margin-top:16px;" id="inspDtlLinkBtn"></div>
+    </div>
+
+  </div>
+
+  <!-- Right column: FBO sidebar -->
+  <div class="officer-detail-actions-col">
+    <div class="officer-card officer-status-card">
+      <h3 class="officer-actions-card__title">FBO Details</h3>
+      <div class="officer-meta-row"><span>Business</span><span id="inspDtlFboName">—</span></div>
+      <div class="officer-meta-row"><span>License / App ID</span><span id="inspDtlFboId" style="font-family:monospace;font-size:11px;">—</span></div>
+      <div class="officer-meta-row"><span>District</span><span id="inspDtlDistrict">—</span></div>
+      <div class="officer-meta-row"><span>Tier</span><span id="inspDtlTier">—</span></div>
+      <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px;">
+        <h3 class="officer-actions-card__title" style="margin-bottom:10px;">Inspection Status</h3>
+        <div class="officer-meta-row"><span>Type</span><span id="inspDtlType">—</span></div>
+        <div class="officer-meta-row"><span>Scheduled Date</span><span id="inspDtlDate">—</span></div>
+        <div class="officer-meta-row"><span>Current Status</span><span id="inspDtlStatus">—</span></div>
+      </div>
+      <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
+        <a id="inspDtlFboLink" href="#" class="officer-modal__confirm" style="text-align:center;text-decoration:none;font-size:13px;">View FBO Profile →</a>
+        <a id="inspDtlSourceLink" href="#" class="officer-btn-return" style="text-align:center;text-decoration:none;font-size:13px;">View Full Record →</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+window.__INSP_TYPE__ = {{ inspection_type | tojson }};
+window.__INSP_ID__   = {{ inspection_id   | tojson }};
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/officer_inspection_detail.js') }}"></script>
+{% endblock %}

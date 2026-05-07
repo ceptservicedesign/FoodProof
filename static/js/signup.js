@@ -1,10 +1,9 @@
 /* ============================================================
-   SIGNUP.JS — /signup page (P04): phone entry → store verificationId → navigate
+   SIGNUP.JS — /signup page (P04): phone entry → navigate to verify
+   Mock OTP flow: no reCAPTCHA, no Firebase SMS.
    ============================================================ */
 (function () {
   'use strict';
-
-  var recaptchaVerifier = null;
 
   function $$(id) { return document.getElementById(id); }
 
@@ -12,52 +11,16 @@
     var el = $$('signupPhoneError'); if (el) el.textContent = msg;
   }
 
-  function setLoading(loading) {
-    var btn = $$('signupSendOtpBtn'); if (!btn) return;
-    btn.disabled    = loading;
-    btn.textContent = loading ? 'Sending…' : 'Send OTP →';
-  }
-
-  function initRecaptcha() {
-    if (recaptchaVerifier) {
-      try { recaptchaVerifier.clear(); } catch (_) {}
-      recaptchaVerifier = null;
-    }
-    recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
-      'signup-recaptcha-container', { size: 'invisible' }
-    );
-  }
-
   function handleSendOtp() {
-    var pi = $$('signupPhoneInput');
+    var pi    = $$('signupPhoneInput');
     var phone = pi ? pi.value.trim().replace(/\D/g, '') : '';
     setError('');
-
     if (phone.length !== 10) {
       setError('Enter a valid 10-digit mobile number.');
       return;
     }
-
-    setLoading(true);
-
-    try { initRecaptcha(); } catch (e) {
-      setLoading(false);
-      setError('reCAPTCHA error. Please refresh and try again.');
-      return;
-    }
-
-    firebase.auth().signInWithPhoneNumber('+91' + phone, recaptchaVerifier)
-      .then(function (result) {
-        sessionStorage.setItem('signup_verification_id', result.verificationId);
-        sessionStorage.setItem('signup_phone', phone);
-        window.location.href = '/signup/verify';
-      })
-      .catch(function (err) {
-        console.error('[FOSCOS] signup sendOtp:', err);
-        setError(err.message || 'Failed to send OTP. Try again.');
-        if (recaptchaVerifier) { try { recaptchaVerifier.clear(); } catch (_) {} recaptchaVerifier = null; }
-        setLoading(false);
-      });
+    sessionStorage.setItem('signup_phone', phone);
+    window.location.href = '/signup/verify';
   }
 
   // Redirect already-logged-in users away from signup
@@ -66,7 +29,7 @@
       if (!user) return;
       if (sessionStorage.getItem('tlFlow') === '1') {
         sessionStorage.removeItem('tlFlow');
-        var lastPage = sessionStorage.getItem('tlLastPage') || '/temp-license/purpose';
+        var lastPage = sessionStorage.getItem('tlLastPage') || '/temp-license';
         sessionStorage.removeItem('tlLastPage');
         window.location.href = lastPage;
       } else {
@@ -92,6 +55,12 @@
         var msg = $$('tlInfoStripMsg');
         if (msg) msg.textContent = '✓ After sign-in you\'ll be directed to Instant License';
       });
+
+      if (sessionStorage.getItem('tlFlow') === '1') {
+        strip.classList.add('signup-info-strip--selected');
+        var msg = $$('tlInfoStripMsg');
+        if (msg) msg.textContent = '✓ After sign-in you\'ll be directed to Instant License';
+      }
     }
   });
 

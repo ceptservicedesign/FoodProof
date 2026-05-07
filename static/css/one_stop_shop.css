@@ -6,6 +6,17 @@
   padding-bottom: 100px; /* space for sticky cart bar */
 }
 
+/* When registration stepper is shown above the header, header doesn't need navbar offset */
+.oss-page--reg-flow .oss-page-header {
+  padding-top: 28px;
+}
+
+/* Registration stepper wrapper */
+#ossRegNav {
+  padding-top: var(--nav-h);
+  background: var(--cream);
+}
+
 /* ── Page header ─────────────────────────────────────────── */
 .oss-page-header {
   background: var(--navy);
@@ -16,6 +27,43 @@
   max-width: 1080px;
   margin: 0 auto;
   padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Back / Home nav strip inside the header */
+.oss-page-header__nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,.14);
+  padding-bottom: 14px;
+  margin-bottom: 20px;
+}
+
+.oss-page-header__back-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,255,255,.75);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: color .15s;
+}
+.oss-page-header__back-link:hover { color: var(--white); }
+
+.oss-page-header__home-link {
+  font-size: 13px;
+  color: rgba(255,255,255,.5);
+  text-decoration: none;
+  transition: color .15s;
+}
+.oss-page-header__home-link:hover { color: var(--white); }
+
+/* Title + Skip/Continue row */
+.oss-page-header__main-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -922,6 +970,112 @@
   background: var(--amber);
 }
 .oss-plan-btn--featured:hover { background: var(--amber-hover); }
+
+/* ── FoSTaC Training tab ─────────────────────────────────── */
+.oss-fostac-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.oss-fostac-meta-item {
+  background: var(--white);
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.oss-fostac-meta-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.oss-fostac-meta-val {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.oss-fostac-actions {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 20px;
+  align-items: center;
+}
+
+.oss-fostac-action-box {
+  background: var(--white);
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.oss-fostac-action-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 8px;
+}
+
+.oss-fostac-action-desc {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.oss-fostac-btn {
+  display: inline-block;
+  padding: 11px 22px;
+  background: var(--navy);
+  color: var(--white);
+  border: none;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: background .15s;
+}
+.oss-fostac-btn:hover { background: var(--navy-dark); }
+
+.oss-fostac-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 22px;
+  background: var(--white);
+  color: var(--navy);
+  border: 2px solid var(--navy);
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: background .15s;
+}
+.oss-fostac-upload-btn:hover { background: var(--cream); }
+
+.oss-fostac-divider {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.oss-fostac-success {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--sage);
+  font-weight: 600;
+}
 
 /* ── Sticky cart bar ─────────────────────────────────────── */
 .oss-cart-bar {

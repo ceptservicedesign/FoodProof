@@ -203,10 +203,11 @@
 
     firebase.firestore().collection('applications').get().then(function (snap) {
       var apps = snap.docs.map(function (d) { return d.data(); });
+      var inProgress = apps.filter(function (a) { return a.applicationStatus !== 'approved'; });
       renderStats(apps);
-      renderPieChart(apps);
+      renderPieChart(inProgress);
       renderBarChart(apps);
-      renderRecentTable(apps);
+      renderRecentTable(inProgress);
     }).catch(function (err) {
       console.error('[FOSCOS] dashboard load:', err);
     });

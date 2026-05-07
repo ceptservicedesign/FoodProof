@@ -31,9 +31,9 @@
 
     <div class="reg-docs-layout">
 
-      <!-- LEFT: progress + accordion -->
+      <!-- LEFT: progress bar + upload cards -->
       <div>
-        <!-- Progress bar -->
+        <!-- Slim progress bar -->
         <div class="reg-docs-progress">
           <div class="reg-docs-progress__bar-wrap">
             <div class="reg-docs-progress__bar" id="docsProgressBar" style="width:0%;"></div>
@@ -41,50 +41,48 @@
           <span class="reg-docs-progress__label" id="docsProgressLabel">0 of 0 uploaded</span>
         </div>
 
-        <!-- Accordion list -->
-        <div class="reg-doc-accordion" id="docList">
-          <!-- Populated dynamically -->
-        </div>
+        <!-- Upload cards — populated dynamically -->
+        <div class="reg-doc-cards" id="docList"></div>
 
-        <!-- WhatsApp checklist -->
-        <a class="reg-whatsapp-btn" id="whatsappChecklistBtn" href="#" target="_blank" rel="noopener">
-          📲 Get document checklist on WhatsApp
-        </a>
-
-        <p class="reg-error" id="docsError" style="margin-top:12px;"></p>
+        <p class="reg-error" id="docsError" style="margin-top:16px;"></p>
       </div>
 
-      <!-- RIGHT: sidebar -->
+      <!-- RIGHT: info sidebar -->
       <div class="reg-docs-sidebar">
 
-        <!-- Accepted IDs -->
+        <!-- Card 1: Accepted Photo IDs -->
         <div class="reg-docs-sidebar__box">
-          <div class="reg-docs-sidebar__title">Accepted Identity Proofs</div>
+          <div class="reg-docs-sidebar__title">✅ Accepted Photo IDs</div>
           <ul class="reg-docs-sidebar__id-list">
             <li>🪪 Aadhaar Card</li>
             <li>📄 PAN Card</li>
-            <li>🛂 Passport</li>
-            <li>🗳️ Voter ID</li>
             <li>🚗 Driving Licence</li>
-            <li>🏛️ Government employee ID</li>
+            <li>🗳️ Voter ID</li>
+            <li>🛂 Passport</li>
+            <li>🏛️ Government Employee ID</li>
           </ul>
+          <p class="reg-docs-sidebar__hint">A clear phone photo of the original is accepted. No scanning required.</p>
         </div>
 
-        <!-- Upload progress -->
+        <!-- Card 2: Upload progress -->
         <div class="reg-docs-sidebar__box">
           <div class="reg-docs-sidebar__title">Upload Progress</div>
-          <div class="reg-docs-upload-progress" id="uploadProgressList">
-            <!-- Populated dynamically -->
-          </div>
+          <div class="reg-docs-upload-progress" id="uploadProgressList"></div>
         </div>
 
-        <!-- Continue button -->
-        <button class="reg-btn-cta" id="docsContinueBtn" style="width:100%;margin-top:4px;">
-          All done, continue →
-        </button>
       </div>
-
     </div>
+
+    <!-- BOTTOM: CTA area -->
+    <div class="reg-docs-cta-area">
+      <button class="reg-btn-cta reg-docs-cta-main" id="docsContinueBtn">
+        Continue to Review →
+      </button>
+      <a class="reg-docs-whatsapp-cta" id="whatsappChecklistBtn" href="#" target="_blank" rel="noopener">
+        📲 WhatsApp Me This Checklist
+      </a>
+    </div>
+
   </div>
 
 </div>

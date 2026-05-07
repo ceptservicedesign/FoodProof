@@ -5,10 +5,23 @@
   'use strict';
 
   // ── State ────────────────────────────────────────────────────
-  var recaptchaVerifier  = null;
-  var confirmationResult = null;
-  var intendedHref       = null;
-  var resendInterval     = null;
+  var intendedHref  = null;
+  var resendInterval = null;
+  var pendingUid    = null;   // set after registration check passes, used to complete login
+
+  // Demo accounts: phone (10 digits) → email created by seed.py
+  var DEMO_PHONES = {
+    '9863010001': 'demo+919863010001@foscos.local',
+    '9863010002': 'demo+919863010002@foscos.local',
+    '9863010003': 'demo+919863010003@foscos.local',
+    '9863010004': 'demo+919863010004@foscos.local',
+    '9863010005': 'demo+919863010005@foscos.local',
+    '9863010006': 'demo+919863010006@foscos.local',
+    '9863010007': 'demo+919863010007@foscos.local',
+    '9863010008': 'demo+919863010008@foscos.local',
+    '9863010009': 'demo+919863010009@foscos.local',
+    '9863010010': 'demo+919863010010@foscos.local',
+  };
 
   function $$(id) { return document.getElementById(id); }
 
@@ -38,6 +51,8 @@
     clearError('loginOtpStep');
     showPhoneStep();
     clearInterval(resendInterval);
+    pendingUid = null;
+    var rb = $$('loginRegisterBtn'); if (rb) rb.style.display = 'none';
   }
 
   function showPhoneStep() {
@@ -55,16 +70,6 @@
     startResendTimer();
   }
 
-  function initRecaptcha() {
-    if (recaptchaVerifier) {
-      try { recaptchaVerifier.clear(); } catch (_) {}
-      recaptchaVerifier = null;
-    }
-    recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
-      'recaptcha-container', { size: 'invisible' }
-    );
-  }
-
   function handleSendOtp() {
     var pi = $$('loginPhoneInput');
     var phone = pi ? pi.value.trim().replace(/\D/g, '') : '';
@@ -73,74 +78,109 @@
       return;
     }
     clearError('loginPhoneStep');
-    setLoading($$('loginSendOtpBtn'), true, 'Sending…');
+    var rb = $$('loginRegisterBtn'); if (rb) rb.style.display = 'none';
 
-    try { initRecaptcha(); } catch (e) {
-      setLoading($$('loginSendOtpBtn'), false, 'Send OTP →');
-      showError('loginPhoneStep', 'reCAPTCHA error. Refresh and try again.');
-      return;
-    }
+    var isDemo = !!DEMO_PHONES[phone];
+    var email  = DEMO_PHONES[phone] || 'mock+91' + phone + '@foscos.local';
 
-    firebase.auth().signInWithPhoneNumber('+91' + phone, recaptchaVerifier)
-      .then(function (result) {
-        confirmationResult = result;
-        showOtpStep(phone);
+    setLoading($$('loginSendOtpBtn'), true, 'Checking…');
+
+    firebase.auth().signInWithEmailAndPassword(email, '123456')
+      .then(function (cred) {
+        if (isDemo) {
+          pendingUid = cred.user.uid;
+          setLoading($$('loginSendOtpBtn'), false, 'Send OTP →');
+          showOtpStep(phone);
+          return;
+        }
+        return firebase.firestore().collection('users').doc(cred.user.uid).get()
+          .then(function (doc) {
+            var d = doc.exists ? doc.data() : {};
+            var valid = LOGIN_PORTAL_STATUSES.indexOf(d.applicationStatus || '') !== -1
+              || !!d.applicationId
+              || !!(d.tempLicense && d.tempLicense.licenseNo);
+            setLoading($$('loginSendOtpBtn'), false, 'Send OTP →');
+            if (!valid) {
+              return firebase.auth().signOut().then(showNotRegistered);
+            }
+            pendingUid = cred.user.uid;
+            showOtpStep(phone);
+          });
       })
       .catch(function (err) {
-        console.error('[FOSCOS] login sendOtp:', err);
-        showError('loginPhoneStep', err.message || 'Failed to send OTP. Try again.');
-        if (recaptchaVerifier) { try { recaptchaVerifier.clear(); } catch (_) {} recaptchaVerifier = null; }
-      })
-      .finally(function () {
+        console.error('[FOSCOS] login check:', err);
         setLoading($$('loginSendOtpBtn'), false, 'Send OTP →');
+        if (isDemo) {
+          showError('loginPhoneStep', 'Demo login failed — run seed.py first.');
+        } else {
+          showNotRegistered();
+        }
       });
+  }
+
+  function afterLogin(uid) {
+    var currentUser = firebase.auth().currentUser;
+    if (currentUser && currentUser.email) {
+      var emailMatch = currentUser.email.match(/^(?:mock|demo)\+91(\d+)@foscos\.local$/);
+      if (emailMatch) {
+        firebase.firestore().collection('users').doc(uid).set({
+          phone: '+91' + emailMatch[1]
+        }, { merge: true }).catch(function () {});
+      }
+    }
+    closeLoginModal();
+    if (intendedHref === 'fbo-select') {
+      intendedHref = null;
+      showFboTypeSelection();
+      return;
+    }
+    if (intendedHref === 'track-smart') {
+      intendedHref = null;
+      doSmartTrackRoute(uid);
+      return;
+    }
+    if (intendedHref && intendedHref !== '#') {
+      window.location.href = intendedHref;
+      intendedHref = null;
+      return;
+    }
+    window.location.href = '/fbo-portal';
+  }
+
+  function showFboTypeSelection() {
+    showFboSubMenu();
+    openHelpModal();
+  }
+
+  var LOGIN_PORTAL_STATUSES = ['submitted','pending','approved','documents_requested',
+    'inspection_scheduled','inspection_complete','final_review'];
+
+  function showNotRegistered() {
+    showError('loginPhoneStep', 'This number is not registered. Please register first.');
+    var rb = $$('loginRegisterBtn'); if (rb) rb.style.display = '';
   }
 
   function handleVerifyOtp() {
     var digits = document.querySelectorAll('.otp-digit');
     var otp = Array.from(digits).map(function (d) { return d.value; }).join('');
     if (otp.length !== 6) return;
-    if (!confirmationResult) return;
+    if (!pendingUid) return;
 
     clearError('loginOtpStep');
-    setLoading($$('loginVerifyOtpBtn'), true, 'Verifying…');
 
-    confirmationResult.confirm(otp)
-      .then(function (cred) {
-        closeLoginModal();
-        if (intendedHref === 'track-smart') {
-          intendedHref = null;
-          doSmartTrackRoute(cred.user.uid);
-          return;
-        }
-        if (intendedHref && intendedHref !== '#') {
-          window.location.href = intendedHref;
-          intendedHref = null;
-          return;
-        }
-        window.location.href = '/fbo-portal';
-      })
-      .catch(function (err) {
-        console.error('[FOSCOS] login verifyOtp:', err);
-        showError('loginOtpStep', 'Incorrect OTP. Please try again.');
-        digits.forEach(function (d) { d.value = ''; });
-        if (digits[0]) digits[0].focus();
-      })
-      .finally(function () {
-        setLoading($$('loginVerifyOtpBtn'), false, 'Verify →');
-      });
+    if (otp !== '123456') {
+      showError('loginOtpStep', 'Incorrect OTP. Enter 123456 to continue.');
+      digits.forEach(function (d) { d.value = ''; });
+      if (digits[0]) digits[0].focus();
+      return;
+    }
+
+    afterLogin(pendingUid);
   }
 
   function handleResendOtp() {
-    var pi = $$('loginPhoneInput');
-    var phone = pi ? pi.value.trim().replace(/\D/g, '') : '';
-    if (!phone) return;
     clearError('loginOtpStep');
-    try { initRecaptcha(); } catch (_) { return; }
-
-    firebase.auth().signInWithPhoneNumber('+91' + phone, recaptchaVerifier)
-      .then(function (result) { confirmationResult = result; startResendTimer(); })
-      .catch(function () { showError('loginOtpStep', 'Failed to resend OTP.'); });
+    startResendTimer();
   }
 
   function startResendTimer() {
@@ -203,6 +243,17 @@
 
   function closeHelpModal() {
     var ov = $$('helpModalOverlay'); if (ov) ov.classList.remove('open');
+    showHelpMainMenu();
+  }
+
+  function showFboSubMenu() {
+    var main = $$('helpMainOptions'); if (main) main.style.display = 'none';
+    var sub  = $$('helpFboSubMenu');  if (sub)  sub.style.display  = '';
+  }
+
+  function showHelpMainMenu() {
+    var main = $$('helpMainOptions'); if (main) main.style.display = '';
+    var sub  = $$('helpFboSubMenu');  if (sub)  sub.style.display  = 'none';
   }
 
   // ════════════════════════════════════════════════════════════
@@ -232,6 +283,7 @@
               '<path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' +
             '</svg>' +
             '<div class="nav-user__dropdown" id="navUserDropdown">' +
+              '<button id="btnDashboard">Go to Dashboard</button>' +
               '<button id="btnLogout">Sign out</button>' +
             '</div>' +
           '</div>';
@@ -243,6 +295,9 @@
         });
         document.addEventListener('click', function () {
           var dd = $$('navUserDropdown'); if (dd) dd.classList.remove('open');
+        });
+        $$('btnDashboard').addEventListener('click', function () {
+          window.location.href = '/fbo-portal';
         });
         $$('btnLogout').addEventListener('click', function () {
           firebase.auth().signOut().then(function () {
@@ -286,6 +341,41 @@
         }
       })
       .catch(function () { window.location.href = '/fbo-portal'; });
+  }
+
+  function doTempLicenseRoute(uid) {
+    firebase.firestore().collection('users').doc(uid).get()
+      .then(function (doc) {
+        var tl = doc.exists ? (doc.data().tempLicense || {}) : {};
+        if (tl.licenseNo) {
+          window.location.href = '/temp-license/issued';
+        } else if (tl.purpose) {
+          window.location.href = '/temp-license/details';
+        } else {
+          window.location.href = '/temp-license';
+        }
+      })
+      .catch(function () { window.location.href = '/temp-license'; });
+  }
+
+  function doPermLicenseRoute(uid) {
+    var PORTAL_STATUSES = ['submitted','pending','approved','documents_requested',
+      'inspection_scheduled','inspection_complete','final_review'];
+    firebase.firestore().collection('users').doc(uid).get()
+      .then(function (doc) {
+        var d = doc.exists ? doc.data() : {};
+        if (PORTAL_STATUSES.indexOf(d.applicationStatus || '') !== -1) {
+          window.location.href = '/fbo-portal'; return;
+        }
+        if (!d.businessTypes || !d.businessTypes.length) { window.location.href = '/about-business'; return; }
+        if (!d.foodTypes || !d.foodTypes.length) { window.location.href = '/food-type'; return; }
+        if (!d.scale || !d.scale.tier) { window.location.href = '/scale'; return; }
+        if (!d.details || !d.details.bizName) { window.location.href = '/business-details'; return; }
+        if (!isDocumentsComplete(d)) { window.location.href = '/documents'; return; }
+        if (!d.review) { window.location.href = '/one-stop-shop?from=documents'; return; }
+        window.location.href = '/review';
+      })
+      .catch(function () { window.location.href = '/about-business'; });
   }
 
   function isDocumentsComplete(d) {
@@ -360,6 +450,12 @@
     var rb = $$('loginResendBtn');
     if (rb) rb.addEventListener('click', function (e) { e.preventDefault(); handleResendOtp(); });
 
+    var regBtn = $$('loginRegisterBtn');
+    if (regBtn) regBtn.addEventListener('click', function () {
+      closeLoginModal();
+      window.location.href = '/signup';
+    });
+
     setupLoginOtpInputs();
 
     // ── Help modal ───────────────────────────────────────────
@@ -377,46 +473,62 @@
     var oh = $$('btnOpenHelp');
     if (oh) oh.addEventListener('click', openHelpModal);
 
-    // FBO button — check auth, then route to correct registration step
+    // FBO button — unauthenticated users go to signup; logged-in users see license selection
     var fbo = $$('btnHelpFbo');
     if (fbo) {
       fbo.addEventListener('click', function () {
         closeHelpModal();
         var user = (firebase.apps && firebase.apps.length) ? firebase.auth().currentUser : null;
-        if (!user) { window.location.href = '/signup'; return; }
+        if (!user) {
+          window.location.href = '/signup';
+        } else {
+          showFboTypeSelection();
+        }
+      });
+    }
 
-        firebase.firestore().collection('users').doc(user.uid).get()
-          .then(function (doc) {
-            var d = doc.exists ? doc.data() : {};
-            var status = d.applicationStatus;
-            var PORTAL_STATUSES = ['submitted','pending','approved','documents_requested',
-              'inspection_scheduled','inspection_complete','final_review'];
-            if (PORTAL_STATUSES.indexOf(status) !== -1) {
-              window.location.href = '/fbo-portal'; return;
-            }
-            // Route to first incomplete step
-            if (!d.businessTypes || !d.businessTypes.length) {
-              window.location.href = '/about-business'; return;
-            }
-            if (!d.foodTypes || !d.foodTypes.length) {
-              window.location.href = '/food-type'; return;
-            }
-            if (!d.scale || !d.scale.tier) {
-              window.location.href = '/scale'; return;
-            }
-            if (!d.details || !d.details.bizName) {
-              window.location.href = '/business-details'; return;
-            }
-            if (!isDocumentsComplete(d)) {
-              window.location.href = '/documents'; return;
-            }
-            // OSS step before review — skip if review already saved
-            if (!d.review) {
-              window.location.href = '/one-stop-shop?from=documents'; return;
-            }
-            window.location.href = '/review';
-          })
-          .catch(function () { window.location.href = '/about-business'; });
+    var fboBack = $$('btnHelpFboBack');
+    if (fboBack) fboBack.addEventListener('click', showHelpMainMenu);
+
+    var tlHelpBtn = $$('btnHelpTempLicense');
+    if (tlHelpBtn) {
+      tlHelpBtn.addEventListener('click', function () {
+        closeHelpModal();
+        var user = (firebase.apps && firebase.apps.length) ? firebase.auth().currentUser : null;
+        if (user) {
+          doTempLicenseRoute(user.uid);
+        } else {
+          sessionStorage.removeItem('tlLastPage');
+          sessionStorage.setItem('tlFlow', '1');
+          window.location.href = '/signup';
+        }
+      });
+    }
+
+    var plHelpBtn = $$('btnHelpPermLicense');
+    if (plHelpBtn) {
+      plHelpBtn.addEventListener('click', function () {
+        closeHelpModal();
+        var user = (firebase.apps && firebase.apps.length) ? firebase.auth().currentUser : null;
+        if (user) {
+          doPermLicenseRoute(user.uid);
+        } else {
+          window.location.href = '/signup';
+        }
+      });
+    }
+
+    // ── Permanent License card (home page) ───────────────────
+    var plCard = $$('cardPermanentLicense');
+    if (plCard) {
+      plCard.addEventListener('click', function (e) {
+        e.preventDefault();
+        var user = (firebase.apps && firebase.apps.length) ? firebase.auth().currentUser : null;
+        if (user) {
+          doPermLicenseRoute(user.uid);
+        } else {
+          window.location.href = '/signup';
+        }
       });
     }
 
@@ -427,8 +539,9 @@
         e.preventDefault();
         var user = (firebase.apps && firebase.apps.length) ? firebase.auth().currentUser : null;
         if (user) {
-          window.location.href = '/temp-license';
+          doTempLicenseRoute(user.uid);
         } else {
+          sessionStorage.removeItem('tlLastPage');
           sessionStorage.setItem('tlFlow', '1');
           window.location.href = '/signup';
         }

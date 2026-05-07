@@ -11,46 +11,80 @@
   var DOC_SPECS = {
     selfie: {
       icon: '🤳', title: 'Photo of Applicant',
-      desc: 'Clear, passport-style photo or selfie. JPG or PNG.',
+      desc: 'Passport-style photo or selfie.',
       required: true,
-      tiers: ['state', 'central']
+      tiers: ['state', 'central'],
+      expandContent: {
+        detail: 'A recent, clear photo of the applicant — passport-style or a selfie against a plain background. JPG or PNG, max 5 MB.',
+        guidance: 'Take the photo in good lighting. Your full face must be clearly visible — no sunglasses, caps, or face coverings. A standard phone camera is perfectly acceptable; no professional photography is required.',
+        buttons: [{ type: 'guide', label: 'Watch a Guide' }]
+      }
     },
     idProof: {
       icon: '🪪', title: 'Photo ID Proof',
       desc: 'Aadhaar, PAN, Passport, Voter ID, or Driving Licence.',
       required: true,
-      tiers: ['temporary-basic', 'basic', 'state', 'central']
+      tiers: ['temporary-basic', 'basic', 'state', 'central'],
+      expandContent: {
+        detail: 'Any valid government-issued photo ID — Aadhaar Card, PAN Card, Passport, Voter ID, or Driving Licence is accepted.',
+        guidance: 'Clear phone photos of the original are accepted — no scanning required. Ensure all four corners are visible and the text is legible. For Aadhaar and Driving Licence, upload both front and back sides in a single file.',
+        buttons: [{ type: 'guide', label: 'Watch a Guide' }, { type: 'faq', label: 'Read FAQ' }]
+      }
     },
     addressProof: {
-      icon: '🏠', title: 'Address Proof',
-      desc: 'Electricity bill, ration card, or lease agreement.',
+      icon: '🏠', title: 'Proof of Premises',
+      desc: 'Rent agreement, electricity bill, or NOC from property owner.',
       required: true,
-      tiers: ['temporary-basic', 'basic', 'state', 'central']
+      tiers: ['temporary-basic', 'basic', 'state', 'central'],
+      expandContent: {
+        detail: 'Document confirming your right to use the food premises — rent/lease agreement, electricity bill, or a No-Objection Certificate (NOC) from the property owner.',
+        guidance: 'If you operate from a shared or cloud kitchen, attach a sub-lease agreement or NOC from the kitchen operator. The address on this document must exactly match the address entered in your application.',
+        buttons: [{ type: 'guide', label: 'Watch a Guide' }, { type: 'faq', label: 'Read FAQ' }]
+      }
     },
     form9: {
-      icon: '📋', title: 'Form IX — Nomination of Person',
-      desc: 'Signed nomination form (download from FSSAI website).',
+      icon: '📋', title: 'Form IX — Nomination',
+      desc: 'Signed nomination form for authorised signatory.',
       required: true,
-      tiers: ['state', 'central']
+      tiers: ['state', 'central'],
+      expandContent: {
+        detail: 'Form IX nominates the person authorised to sign FSSAI documents on behalf of your business entity.',
+        guidance: 'Download the latest Form IX from the FSSAI website. Fill in the nominee\'s details completely, obtain the authorised signature and company stamp, then upload a clear photo or scan.',
+        buttons: [{ type: 'guide', label: 'Watch a Guide' }]
+      }
     },
     blueprint: {
-      icon: '🗺️', title: 'Premises Blueprint / Layout',
-      desc: 'Scaled layout plan of the food premises.',
+      icon: '🗺️', title: 'Premises Blueprint',
+      desc: 'Scaled floor plan showing kitchen, storage, and exit points.',
       required: true,
-      tiers: ['state', 'central']
+      tiers: ['state', 'central'],
+      expandContent: {
+        detail: 'A floor plan of your food premises showing the layout — kitchen area, food storage, washing zone, and entry/exit points. Dimensions and scale should be indicated.',
+        guidance: 'A hand-drawn plan is acceptable for smaller premises. Use graph paper for easier scaling. Label each area clearly (cooking, dry storage, cold storage, wash area), note dimensions in feet or metres, and mark the main entry/exit.',
+        buttons: [{ type: 'guide', label: 'Watch a Guide' }, { type: 'faq', label: 'Read FAQ' }]
+      }
     },
     waterTestReport: {
-      icon: '💧', title: 'Water Test Report',
-      desc: 'Potability test from an approved lab — confirms water used in food preparation is safe.',
+      icon: '💧', title: 'Water Analysis Report',
+      desc: 'NABL-accredited lab report, dated within last 6 months.',
       required: true,
       tiers: ['basic', 'state', 'central'],
-      bookLabTest: true
+      expandContent: {
+        detail: 'A water potability report from an NABL-accredited laboratory confirming that water used in food preparation is safe for consumption.',
+        guidance: 'The report must test for pH, coliform bacteria, TDS, and hardness — minimum 5 parameters. It must be dated within the last 6 months. Use the Book Lab Test button to schedule a lab visit directly from FOSCOS.',
+        buttons: [{ type: 'guide', label: 'Watch a Guide' }, { type: 'faq', label: 'Read FAQ' }, { type: 'labtest', label: 'Book Lab Test' }]
+      }
     },
     nocFireDept: {
-      icon: '🔥', title: 'NOC from Fire Department',
-      desc: 'Required for large premises (over 1000 sq ft).',
+      icon: '🔥', title: 'NOC — Fire Department',
+      desc: 'Required for premises over 1000 sq ft.',
       required: false,
-      tiers: ['central']
+      tiers: ['central'],
+      expandContent: {
+        detail: 'A No-Objection Certificate from your local fire department, required for food premises over 1,000 sq ft or those with commercial cooking equipment, gas pipelines, or industrial appliances.',
+        guidance: 'Apply in person at your nearest fire station with a floor plan and equipment list. Processing typically takes 7–15 working days. The NOC fee is paid directly to the fire department, not through FOSCOS.',
+        buttons: [{ type: 'guide', label: 'Watch a Guide' }, { type: 'faq', label: 'Read FAQ' }]
+      }
     }
   };
 
@@ -102,97 +136,145 @@
     });
   }
 
-  // ── Build accordion ───────────────────────────────────────────
+  // ── Build upload cards ────────────────────────────────────────
   function buildDocList(tier) {
     currentTier = tier;
     var list = document.getElementById('docList');
     if (!list) return;
     list.innerHTML = '';
 
+    var num = 0;
     Object.keys(DOC_SPECS).forEach(function (key) {
       var spec = DOC_SPECS[key];
       if (spec.tiers.indexOf(tier) === -1) return;
+      num++;
 
       var isUploaded = !!uploadedDocs[key];
       var isOptional = !spec.required;
-
-      var item = document.createElement('div');
-      item.className = 'reg-doc-item';
-      item.id        = 'docItem-' + key;
+      var numStr     = num < 10 ? '0' + num : '' + num;
 
       var tagHtml = isOptional
         ? '<span class="reg-doc-item__tag optional">Optional</span>'
-        : '<span class="reg-doc-item__tag">Required</span>';
-
-      var checkHtml = isUploaded
-        ? '<div class="reg-doc-item__check uploaded">✓</div>'
-        : '<div class="reg-doc-item__check" id="docCheck-' + key + '"></div>';
-
-      var bookLabHtml = spec.bookLabTest
-        ? '<a class="reg-doc-item__book-lab" href="/one-stop-shop">🧪 Book a Lab Test →</a>'
         : '';
 
-      item.innerHTML =
-        '<div class="reg-doc-item__header" data-key="' + key + '">' +
-          checkHtml +
-          '<span class="reg-doc-item__name">' + spec.icon + ' ' + spec.title + '</span>' +
-          tagHtml +
-          '<span class="reg-doc-item__arrow">▼</span>' +
+      // ── Build expand / detail panel HTML ──────────────────────
+      var ec = spec.expandContent || {};
+      var btnsHtml = '';
+      if (ec.buttons && ec.buttons.length) {
+        btnsHtml = '<div class="reg-doc-card__helper-btns">';
+        ec.buttons.forEach(function (b) {
+          if (b.type === 'labtest') {
+            btnsHtml += '<a class="reg-doc-card__helper-btn reg-doc-card__helper-btn--lab" href="/one-stop-shop">🧪 ' + b.label + '</a>';
+          } else if (b.type === 'faq') {
+            btnsHtml += '<button type="button" class="reg-doc-card__helper-btn" data-action="faq">📖 ' + b.label + '</button>';
+          } else {
+            btnsHtml += '<button type="button" class="reg-doc-card__helper-btn" data-action="guide">▶ ' + b.label + '</button>';
+          }
+        });
+        btnsHtml += '</div>';
+      }
+
+      var detailHtml = (ec.detail || ec.guidance || btnsHtml)
+        ? '<div class="reg-doc-card__detail" id="docDetail-' + key + '">' +
+            '<div class="reg-doc-card__detail-body">' +
+              (ec.detail   ? '<p class="reg-doc-card__detail-text">' + ec.detail + '</p>' : '') +
+              (ec.guidance ? '<p class="reg-doc-card__detail-guidance"><strong>Submission tip:</strong> ' + ec.guidance + '</p>' : '') +
+              btnsHtml +
+            '</div>' +
+          '</div>'
+        : '';
+
+      var card = document.createElement('div');
+      card.className = 'reg-doc-card' + (isUploaded ? ' uploaded' : '');
+      card.id        = 'docItem-' + key;
+
+      card.innerHTML =
+        '<div class="reg-doc-card__num" id="docNum-' + key + '">' +
+          (isUploaded ? '✓' : numStr) +
         '</div>' +
-        '<div class="reg-doc-item__body">' +
-          '<p class="reg-doc-item__desc">' + spec.desc + '</p>' +
-          bookLabHtml +
-          '<label class="reg-doc-item__upload-btn" id="docLabel-' + key + '">' +
-            (isUploaded ? '✓ Uploaded — Replace?' : '⬆ Upload file') +
-            '<input type="file" class="reg-doc-item__file-input" id="docInput-' + key + '" accept="image/*,.pdf" data-key="' + key + '" />' +
-          '</label>' +
-          '<div class="reg-doc-item__uploaded-name" id="docStatus-' + key + '">' +
+        '<div class="reg-doc-card__body">' +
+          '<div class="reg-doc-card__title">' + spec.icon + ' ' + spec.title +
+            (tagHtml ? ' ' + tagHtml : '') +
+          '</div>' +
+          '<div class="reg-doc-card__desc">' + spec.desc + '</div>' +
+          '<div class="reg-doc-card__status" id="docStatus-' + key + '">' +
             (isUploaded ? 'File uploaded successfully' : '') +
           '</div>' +
-          '<div class="reg-doc-item__links">' +
-            '<button class="reg-doc-item__link-btn">▶ Watch a guide</button>' +
-            '<button class="reg-doc-item__link-btn">📖 Read FAQ</button>' +
-          '</div>' +
-        '</div>';
+        '</div>' +
+        '<label class="reg-doc-card__upload-btn' + (isUploaded ? ' done' : '') + '" id="docLabel-' + key + '">' +
+          '<span id="docLabelText-' + key + '">' + (isUploaded ? '✓ Uploaded' : '⬆ Upload') + '</span>' +
+          '<input type="file" class="reg-doc-card__file-input" id="docInput-' + key + '" accept="image/*,.pdf" data-key="' + key + '" />' +
+        '</label>' +
+        (detailHtml ? '<button type="button" class="reg-doc-card__expand-btn" id="docExpand-' + key + '" aria-label="Show guidance" aria-expanded="false"></button>' : '') +
+        detailHtml;
 
-      list.appendChild(item);
+      list.appendChild(card);
 
-      // Accordion toggle
-      item.querySelector('.reg-doc-item__header').addEventListener('click', function () {
-        item.classList.toggle('open');
+      // ── Expand / collapse ──────────────────────────────────────
+      var expandBtn = document.getElementById('docExpand-' + key);
+      if (expandBtn) {
+        expandBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var cardEl = document.getElementById('docItem-' + key);
+          var isOpen = cardEl.classList.contains('expanded');
+          if (isOpen) {
+            cardEl.classList.remove('expanded');
+            expandBtn.setAttribute('aria-expanded', 'false');
+          } else {
+            cardEl.classList.add('expanded');
+            expandBtn.setAttribute('aria-expanded', 'true');
+          }
+        });
+      }
+
+      // ── Helper button placeholders ────────────────────────────
+      card.querySelectorAll('.reg-doc-card__helper-btn[data-action]').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var action = btn.getAttribute('data-action');
+          if (action === 'guide') {
+            alert('Video guide coming soon.');
+          } else if (action === 'faq') {
+            alert('FAQ coming soon.');
+          }
+        });
       });
 
-      // File input change → upload
+      // ── File input → upload ───────────────────────────────────
       var fileInput = document.getElementById('docInput-' + key);
       fileInput.addEventListener('change', function (e) {
         e.stopPropagation();
         var file = fileInput.files[0];
         if (!file) return;
 
-        var label  = document.getElementById('docLabel-' + key);
-        var status = document.getElementById('docStatus-' + key);
-        if (label)  label.textContent = '⏳ Uploading…';
-        if (status) status.textContent = '';
+        var labelEl   = document.getElementById('docLabel-' + key);
+        var labelText = document.getElementById('docLabelText-' + key);
+        var status    = document.getElementById('docStatus-' + key);
+        var numEl     = document.getElementById('docNum-' + key);
+
+        if (labelEl)   labelEl.className = 'reg-doc-card__upload-btn';
+        if (labelText) labelText.textContent = '⏳ Uploading…';
+        if (status)    status.textContent = '';
 
         uploadDoc(key, file, function (url) {
           uploadedDocs[key] = url;
           saveDocUrl(key, url);
 
-          var check = document.getElementById('docCheck-' + key);
-          if (check) { check.className = 'reg-doc-item__check uploaded'; check.textContent = '✓'; }
-          if (label)  label.textContent = '✓ Uploaded — Replace?';
-          if (status) status.textContent = file.name + ' — uploaded';
+          var cardEl = document.getElementById('docItem-' + key);
+          if (cardEl)    { cardEl.classList.add('uploaded'); cardEl.classList.remove('expanded'); }
+          if (numEl)     numEl.textContent = '✓';
+          if (labelEl)   labelEl.className = 'reg-doc-card__upload-btn done';
+          if (labelText) labelText.textContent = '✓ Uploaded';
+          if (status)    status.textContent = file.name + ' — uploaded';
 
           document.getElementById('docsError').textContent = '';
           updateProgress();
         }, function () {
-          if (label)  label.textContent = '⬆ Upload file';
-          if (status) status.textContent = 'Upload failed — please try again';
+          if (labelEl)   labelEl.className = 'reg-doc-card__upload-btn';
+          if (labelText) labelText.textContent = '⬆ Upload';
+          if (status)    status.textContent = 'Upload failed — please try again';
         });
       });
-
-      // Open item if already done so user can see status
-      if (isUploaded) item.classList.remove('open');
     });
 
     updateProgress();

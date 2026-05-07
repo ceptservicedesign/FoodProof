@@ -1,0 +1,180 @@
+{% extends "officer/_base.html" %}
+
+{% block title %}Grievance Detail — FOSCOS Officer Portal{% endblock %}
+{% block nav_grievances %}active{% endblock %}
+
+{% block content %}
+
+<!-- ── Header: grievance ID + action buttons ── -->
+<div class="officer-detail-header">
+  <div class="officer-detail-header__meta">
+    <div class="biz-name" id="detailRestaurantName">Loading…</div>
+    <div class="biz-sub" id="detailGrvId">—</div>
+  </div>
+  <div class="officer-detail-actions">
+    <button class="officer-btn-return" id="btnAdvanceStep">⏩ Advance Step</button>
+    <button class="officer-btn-return" id="btnScheduleInspection">📋 Schedule Inspection</button>
+    <button class="officer-btn-approve" id="btnResolve">✓ Resolve Case</button>
+    <button class="officer-btn-flag" id="btnFlag">⚑ Flag</button>
+    <button class="officer-btn-return" id="btnContactConsumer">📞 Contact Consumer</button>
+    <a href="#" onclick="history.back();return false;" class="officer-btn-return" style="text-decoration:none;">← Back</a>
+  </div>
+</div>
+
+<!-- ── Status pipeline ── -->
+<div class="officer-pipeline" id="detailPipeline">
+  <div class="officer-pipeline__step" data-step="submitted">Submitted</div>
+  <div class="officer-pipeline__arrow">&#8594;</div>
+  <div class="officer-pipeline__step" data-step="under_review">Under Review</div>
+  <div class="officer-pipeline__arrow">&#8594;</div>
+  <div class="officer-pipeline__step" data-step="action_taken">Action Taken</div>
+  <div class="officer-pipeline__arrow">&#8594;</div>
+  <div class="officer-pipeline__step" data-step="inspection_scheduled">Inspection</div>
+  <div class="officer-pipeline__arrow">&#8594;</div>
+  <div class="officer-pipeline__step" data-step="resolved">Resolved</div>
+</div>
+
+<!-- ── Two-column layout ── -->
+<div class="officer-detail-layout">
+
+  <!-- Left: Tabs -->
+  <div class="officer-card officer-detail-tabs-card">
+    <div class="officer-tabs" id="detailTabs">
+      <button class="officer-tab active" data-tab="details">Grievance Details</button>
+      <button class="officer-tab" data-tab="ratings">Evidence &amp; Ratings</button>
+      <button class="officer-tab" data-tab="consumer">Consumer Details</button>
+      <button class="officer-tab" data-tab="fboresponse">FBO Response</button>
+      <button class="officer-tab" data-tab="history">Status History</button>
+    </div>
+
+    <!-- Tab: Grievance Details -->
+    <div class="officer-tab-panel active" id="tabDetails">
+      <div class="officer-info-grid" id="detailsGrid">
+        <div class="officer-info-loading">Loading…</div>
+      </div>
+    </div>
+
+    <!-- Tab: Evidence & Ratings -->
+    <div class="officer-tab-panel" id="tabRatings">
+      <div id="ratingsGrid">
+        <div class="officer-info-loading">Loading…</div>
+      </div>
+    </div>
+
+    <!-- Tab: Consumer Details -->
+    <div class="officer-tab-panel" id="tabConsumer">
+      <div class="officer-info-grid" id="consumerGrid">
+        <div class="officer-info-loading">Loading…</div>
+      </div>
+    </div>
+
+    <!-- Tab: FBO Response -->
+    <div class="officer-tab-panel" id="tabFboresponse">
+      <div id="fboResponsePanel">
+        <div class="officer-info-loading">Loading…</div>
+      </div>
+    </div>
+
+    <!-- Tab: Status History -->
+    <div class="officer-tab-panel" id="tabHistory">
+      <div id="historyPanel">
+        <div class="officer-info-loading">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Status + Meta -->
+  <div class="officer-detail-actions-col">
+    <div class="officer-card officer-status-card">
+      <h3 class="officer-actions-card__title">Current Status</h3>
+      <div id="currentStatusBadge" class="officer-status-badge-lg"></div>
+      <div class="officer-meta-row"><span>Filed</span><span id="metaFiled">—</span></div>
+      <div class="officer-meta-row"><span>Category</span><span id="metaCategory">—</span></div>
+      <div class="officer-meta-row"><span>Restaurant</span><span id="metaRestaurant">—</span></div>
+      <div class="officer-meta-row"><span>Overall Rating</span><span id="metaOverall">—</span></div>
+      <div class="officer-meta-row"><span>Inspection Date</span><span id="metaInspectionDate">—</span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Action confirmation modal ── -->
+<div class="officer-modal-overlay" id="actionModalOverlay">
+  <div class="officer-modal">
+    <h3 class="officer-modal__title" id="actionModalTitle">Confirm Action</h3>
+    <p class="officer-modal__body" id="actionModalBody"></p>
+    <div id="actionModalDateWrap" style="display:none; margin-bottom:12px;">
+      <label style="font-size:13px;font-weight:600;color:var(--navy);display:block;margin-bottom:6px;">Inspection Date</label>
+      <input type="date" id="actionModalDate" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit;" />
+    </div>
+    <textarea class="officer-modal__textarea" id="actionModalNote" placeholder="Add a note (optional)…" rows="3"></textarea>
+    <p class="officer-modal__error" id="actionModalError"></p>
+    <div class="officer-modal__footer">
+      <button class="officer-modal__cancel" id="actionModalCancel">Cancel</button>
+      <button class="officer-modal__confirm" id="actionModalConfirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Flag modal ── -->
+<div class="officer-modal-overlay" id="flagModalOverlay">
+  <div class="officer-modal">
+    <h3 class="officer-modal__title">Flag Grievance</h3>
+    <p class="officer-modal__body">Flag this grievance for escalation or internal review.</p>
+
+    <div class="officer-modal__field">
+      <label for="flagIssueType">Issue Type</label>
+      <select id="flagIssueType">
+        <option value="">Select issue type…</option>
+        <option value="evidence_insufficient">Insufficient Evidence</option>
+        <option value="repeat_offender">Repeat Offender</option>
+        <option value="public_health_risk">Public Health Risk</option>
+        <option value="requires_lab_test">Requires Lab Testing</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+
+    <div class="officer-modal__field">
+      <label for="flagPriority">Priority</label>
+      <select id="flagPriority">
+        <option value="low">Low</option>
+        <option value="medium" selected>Medium</option>
+        <option value="high">High</option>
+        <option value="critical">Critical</option>
+      </select>
+    </div>
+
+    <div class="officer-modal__field">
+      <label for="flagNote">Notes</label>
+      <textarea id="flagNote" rows="3" placeholder="Describe the issue…"></textarea>
+    </div>
+
+    <p class="officer-modal__error" id="flagModalError"></p>
+    <div class="officer-modal__footer">
+      <button class="officer-modal__cancel" id="flagModalCancel">Cancel</button>
+      <button class="officer-modal__confirm officer-btn-flag" id="flagModalConfirm">Flag Grievance</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Contact Consumer modal ── -->
+<div class="officer-modal-overlay" id="contactModalOverlay">
+  <div class="officer-modal">
+    <h3 class="officer-modal__title">Consumer Details</h3>
+    <div style="margin: 16px 0;">
+      <div class="officer-meta-row"><span>Name</span><span id="contactName">—</span></div>
+      <div class="officer-meta-row"><span>Phone</span><span id="contactPhone">—</span></div>
+    </div>
+    <p style="font-size:13px;color:var(--text-muted);">Contact the consumer for additional information or to provide a case update.</p>
+    <div class="officer-modal__footer">
+      <button class="officer-modal__cancel" id="contactModalClose">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>window.__GRV_ID__ = {{ grv_id | tojson }};</script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/officer_grievance_detail.js') }}"></script>
+{% endblock %}

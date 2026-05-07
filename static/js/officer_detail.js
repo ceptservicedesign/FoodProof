@@ -136,9 +136,9 @@
     var list = document.getElementById('documentsList');
     if (!list) return;
 
-    var required = ['selfie'];
-    if (tier !== 'temporary-basic') required.push('idProof', 'addressProof');
-    if (tier === 'state' || tier === 'central') required.push('form9', 'blueprint', 'waterTestReport');
+    var required = [];
+    if (tier !== 'temporary-basic') required.push('idProof', 'addressProof', 'waterTestReport');
+    if (tier === 'state' || tier === 'central') required.push('form9', 'blueprint');
     if (tier === 'central') required.push('nocFireDept');
 
     list.innerHTML = required.map(function (key) {
@@ -189,6 +189,105 @@
         '</div>' +
         '</div>';
     }).join('');
+  }
+
+  // ── Inspection tab ────────────────────────────────────────────
+  var INSPECTION_STATUSES = ['inspection_scheduled', 'inspection_complete', 'final_review', 'approved'];
+
+  function renderInspection(d) {
+    var wrap = document.getElementById('inspectionPanel');
+    if (!wrap) return;
+    var status = d.applicationStatus || '';
+    var rec    = d.inspectionRecord;
+
+    if (INSPECTION_STATUSES.indexOf(status) === -1) {
+      wrap.innerHTML = '<p class="officer-info-loading">Inspection is not yet scheduled — application has not reached the Inspection stage.</p>';
+      return;
+    }
+
+    var formHtml =
+      '<div class="officer-inspection-form" id="inspectionForm">' +
+        '<div class="officer-modal__field">' +
+          '<label>Inspection Date</label>' +
+          '<input type="date" id="inspDateInput" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit;" />' +
+        '</div>' +
+        '<div class="officer-modal__field">' +
+          '<label>Officer Assigned</label>' +
+          '<input type="text" id="inspOfficerInput" placeholder="Officer name…" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit;" />' +
+        '</div>' +
+        '<div class="officer-modal__field">' +
+          '<label>Inspection Notes</label>' +
+          '<textarea id="inspNotesInput" rows="3" placeholder="Pre-inspection notes, checklist items…" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit;resize:vertical;"></textarea>' +
+        '</div>' +
+        '<div style="display:flex;gap:10px;align-items:center;margin-top:4px;">' +
+          '<button class="officer-modal__confirm" id="inspSaveBtn">Save Inspection Details</button>' +
+          '<span id="inspSavedMsg" style="font-size:13px;color:#16a34a;font-weight:600;display:none;">✔ Saved</span>' +
+        '</div>' +
+      '</div>';
+
+    if (rec) {
+      wrap.innerHTML =
+        '<div class="officer-info-grid" style="margin-bottom:20px">' +
+          infoItem('Scheduled Date',    rec.date     || '—') +
+          infoItem('Assigned Officer',  rec.officer  || '—') +
+          infoItem('Saved By',          rec.savedBy  || '—') +
+          infoItemFull('Notes',         rec.notes    || '—') +
+        '</div>' +
+        '<p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Update inspection details below:</p>' +
+        formHtml;
+      document.getElementById('inspDateInput').value    = rec.date    || '';
+      document.getElementById('inspOfficerInput').value = rec.officer || '';
+      document.getElementById('inspNotesInput').value   = rec.notes   || '';
+    } else {
+      wrap.innerHTML =
+        '<p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">This application is at the Inspection stage. Record the inspection details below.</p>' +
+        formHtml;
+    }
+
+    document.getElementById('inspSaveBtn').addEventListener('click', saveInspection);
+  }
+
+  function saveInspection() {
+    var dateVal    = (document.getElementById('inspDateInput').value   || '').trim();
+    var officerVal = (document.getElementById('inspOfficerInput').value || '').trim();
+    var notesVal   = (document.getElementById('inspNotesInput').value   || '').trim();
+    var btn        = document.getElementById('inspSaveBtn');
+    var msg        = document.getElementById('inspSavedMsg');
+
+    if (!dateVal) { alert('Please select an inspection date.'); return; }
+
+    btn.disabled    = true;
+    btn.textContent = 'Saving…';
+
+    var rec = {
+      date:      dateVal,
+      officer:   officerVal || 'FSO',
+      notes:     notesVal,
+      savedBy:   'officer',
+      savedAt:   firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    var auditEntry = {
+      action:    'Inspection details recorded — ' + dateVal,
+      by:        officerVal || 'officer',
+      statusKey: 'inspection_scheduled',
+      timestamp: new Date().toISOString()
+    };
+
+    firebase.firestore().collection('applications').doc(appId).update({
+      inspectionRecord: rec,
+      auditTrail: firebase.firestore.FieldValue.arrayUnion(auditEntry)
+    }).then(function () {
+      if (appData) appData.inspectionRecord = rec;
+      btn.disabled    = false;
+      btn.textContent = 'Save Inspection Details';
+      if (msg) { msg.style.display = ''; setTimeout(function () { msg.style.display = 'none'; }, 3000); }
+    }).catch(function (err) {
+      console.error('[officer-detail] inspection save:', err);
+      btn.disabled    = false;
+      btn.textContent = 'Save Inspection Details';
+      alert('Could not save. Please try again.');
+    });
   }
 
   // ── Flags tab ─────────────────────────────────────────────────
@@ -347,10 +446,17 @@
       if (note) userUpdate.lastOfficerNote = note;
       batch.set(db.collection('users').doc(appData.uid), userUpdate, { merge: true });
 
+      var notifMsg = 'Your application has been flagged: ' + issueType +
+        (note ? '. Officer note: "' + note + '"' : '') +
+        '. Please check Track My Application for details.';
+
       batch.set(db.collection('notifications').doc(), {
         uid:       appData.uid,
         appId:     appId,
-        message:   'Your application has been flagged for internal review. You may be contacted for more information.',
+        message:   notifMsg,
+        issueType: issueType,
+        note:      note || '',
+        priority:  priority,
         type:      'flag',
         createdAt: ts,
         read:      false
@@ -453,6 +559,23 @@
   }
 
   // ── Tabs ──────────────────────────────────────────────────────
+  var DETAIL_CATEGORY_LABELS = {
+    'hygiene':       'Hygiene',
+    'food-quality':  'Food Quality',
+    'mislabelling':  'Mislabelling',
+    'adulteration':  'Adulteration'
+  };
+
+  var DETAIL_STATUS_KEYS = {
+    'Resolved':             'resolved',
+    'Action Taken':         'approved',
+    'Inspection Scheduled': 'inspection_scheduled',
+    'Under Review':         'inspection_scheduled',
+    'Submitted':            'submitted'
+  };
+
+  var detailGrvLoaded = false;
+
   function setupTabs() {
     document.querySelectorAll('.officer-tab').forEach(function (tab) {
       tab.addEventListener('click', function () {
@@ -462,8 +585,71 @@
         tab.classList.add('active');
         var panel = document.getElementById('tab' + capitalize(target));
         if (panel) panel.classList.add('active');
+        if (target === 'grievances' && !detailGrvLoaded && appData) {
+          detailGrvLoaded = true;
+          loadGrievancesForApp(appData.appId || appId);
+        }
       });
     });
+  }
+
+  function loadGrievancesForApp(restaurantId) {
+    var listEl  = document.getElementById('detailGrvList');
+    var countEl = document.getElementById('detailGrvCount');
+    if (!listEl) return;
+
+    firebase.firestore()
+      .collection('grievances')
+      .where('restaurantId', '==', restaurantId)
+      .get()
+      .then(function (snap) {
+        if (snap.empty) {
+          listEl.innerHTML = '<div class="officer-info-loading">No grievances filed against this FBO.</div>';
+          return;
+        }
+
+        var docs = snap.docs
+          .map(function (d) { return Object.assign({ _id: d.id }, d.data()); })
+          .sort(function (a, b) {
+            var ta = a.filedAt && a.filedAt.seconds ? a.filedAt.seconds : 0;
+            var tb = b.filedAt && b.filedAt.seconds ? b.filedAt.seconds : 0;
+            return tb - ta;
+          });
+
+        if (countEl) countEl.textContent = docs.length;
+
+        var rows = docs.map(function (g) {
+          var filed = g.filedAt && g.filedAt.toDate
+            ? g.filedAt.toDate().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+            : '—';
+          var sk = DETAIL_STATUS_KEYS[g.status] || 'submitted';
+          var hasFboResponse = g.fboResponse && g.fboResponse.comment;
+          return '<tr>' +
+            '<td>' + filed + '</td>' +
+            '<td>' + esc(DETAIL_CATEGORY_LABELS[g.category] || g.category || '—') + '</td>' +
+            '<td style="font-weight:600">' + (g.overall || '—') + ' / 5</td>' +
+            '<td>' + esc(g.consumerName  || '—') + '</td>' +
+            '<td>' + esc(g.consumerPhone || '—') + '</td>' +
+            '<td class="officer-grv-comment">' + esc(g.comment || '') + '</td>' +
+            '<td>' + (hasFboResponse ? '<span style="color:#16a34a;font-weight:600;font-size:12px">✔ Responded</span>' : '<span style="color:var(--text-muted);font-size:12px">—</span>') + '</td>' +
+            '<td><span class="officer-badge officer-badge--' + sk + '">' + esc(g.status || '—') + '</span></td>' +
+          '</tr>';
+        }).join('');
+
+        listEl.innerHTML =
+          '<table class="officer-table" style="margin-top:0">' +
+            '<thead><tr>' +
+              '<th>Filed</th><th>Category</th><th>Overall</th>' +
+              '<th>Consumer</th><th>Phone</th><th>Comment</th>' +
+              '<th>FBO Response</th><th>Status</th>' +
+            '</tr></thead>' +
+            '<tbody>' + rows + '</tbody>' +
+          '</table>';
+      })
+      .catch(function (err) {
+        listEl.innerHTML = '<div class="officer-info-loading">Failed to load grievances.</div>';
+        console.error('[officer-detail] grievances:', err);
+      });
   }
 
   function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
@@ -477,20 +663,37 @@
       }
 
       appData = doc.data();
-      var status  = appData.applicationStatus || 'submitted';
-      var bizName = (appData.details && appData.details.bizName) || appData.appId || appId;
 
-      setText('detailBizName', bizName);
-      setText('detailAppId',   appData.appId || appId);
+      var renderAll = function () {
+        var status  = appData.applicationStatus || 'submitted';
+        var bizName = (appData.details && appData.details.bizName) || appData.appId || appId;
 
-      renderPipeline(status);
-      renderStatusBadge(status);
-      renderMeta(appData);
-      renderBusinessInfo(appData);
-      renderDocuments(appData);
-      renderAudit(appData);
-      renderFlags(appData);
-      setupHeaderActions(status);
+        setText('detailBizName', bizName);
+        setText('detailAppId',   appData.appId || appId);
+
+        renderPipeline(status);
+        renderStatusBadge(status);
+        renderMeta(appData);
+        renderBusinessInfo(appData);
+        renderDocuments(appData);
+        renderInspection(appData);
+        renderAudit(appData);
+        renderFlags(appData);
+        setupHeaderActions(status);
+      };
+
+      if (!appData.phone && appData.uid) {
+        firebase.firestore().collection('users').doc(appData.uid).get()
+          .then(function (userDoc) {
+            if (userDoc.exists && userDoc.data().phone) {
+              appData.phone = userDoc.data().phone;
+            }
+            renderAll();
+          })
+          .catch(renderAll);
+      } else {
+        renderAll();
+      }
 
     }).catch(function (err) {
       console.error('[FOSCOS] detail load:', err);

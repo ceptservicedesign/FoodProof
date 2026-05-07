@@ -1,0 +1,125 @@
+{% extends "officer/_base.html" %}
+{% block title %}Profile — FOSCOS Officer Portal{% endblock %}
+{% block nav_profile %}active{% endblock %}
+
+{% block content %}
+<div class="officer-page-header">
+  <div>
+    <h1 class="officer-page-title">Settings &amp; Profile</h1>
+    <p class="officer-page-sub">Your account details and performance overview</p>
+  </div>
+</div>
+
+<div class="officer-detail-layout">
+
+  <!-- Left: Officer info + stats -->
+  <div>
+
+    <!-- Officer card -->
+    <div class="officer-card" style="margin-bottom:20px;">
+      <div style="display:flex;align-items:center;gap:18px;margin-bottom:24px;">
+        <div style="width:56px;height:56px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0;" id="profAvatar">?</div>
+        <div>
+          <div style="font-size:18px;font-weight:700;color:var(--navy);" id="profName">Loading…</div>
+          <div style="font-size:13px;color:var(--text-muted);" id="profEmail">—</div>
+          <div style="margin-top:4px;"><span style="font-size:11px;font-weight:700;padding:2px 10px;border-radius:6px;background:#eff6ff;color:#1d4ed8;">FSSAI Officer</span></div>
+        </div>
+      </div>
+
+      <div class="officer-info-grid">
+        <div class="officer-info-item">
+          <span class="officer-info-item__label">Officer ID</span>
+          <span class="officer-info-item__value" id="profUid" style="font-family:monospace;font-size:12px;">—</span>
+        </div>
+        <div class="officer-info-item">
+          <span class="officer-info-item__label">Role</span>
+          <span class="officer-info-item__value">Food Safety Officer</span>
+        </div>
+        <div class="officer-info-item">
+          <span class="officer-info-item__label">Account Created</span>
+          <span class="officer-info-item__value" id="profCreatedAt">—</span>
+        </div>
+        <div class="officer-info-item">
+          <span class="officer-info-item__label">Jurisdiction</span>
+          <span class="officer-info-item__value" id="profJurisdiction">—</span>
+        </div>
+      </div>
+
+      <!-- Editable jurisdiction -->
+      <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px;">
+        <label style="font-size:12px;font-weight:600;color:var(--navy);display:block;margin-bottom:6px;">Update Jurisdiction</label>
+        <div style="display:flex;gap:10px;">
+          <input type="text" id="profJurisdictionInput" placeholder="e.g. West Zone, Ahmedabad District…"
+            style="flex:1;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13.5px;font-family:inherit;" />
+          <button class="officer-modal__confirm" id="profSaveBtn" style="padding:8px 18px;font-size:13px;">Save</button>
+          <span id="profSavedMsg" style="font-size:13px;color:#16a34a;font-weight:600;align-self:center;display:none;">✔ Saved</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats grid -->
+    <div class="officer-stat-grid" style="margin-bottom:20px;" id="profStatsGrid">
+      <div class="officer-stat-card">
+        <div class="officer-stat-card__icon officer-stat-card__icon--green">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="officer-stat-card__body">
+          <div class="officer-stat-card__value" id="profStatApproved">—</div>
+          <div class="officer-stat-card__label">Licenses Issued</div>
+        </div>
+      </div>
+      <div class="officer-stat-card">
+        <div class="officer-stat-card__icon officer-stat-card__icon--blue">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <div class="officer-stat-card__body">
+          <div class="officer-stat-card__value" id="profStatInspections">—</div>
+          <div class="officer-stat-card__label">Inspections Conducted</div>
+        </div>
+      </div>
+      <div class="officer-stat-card">
+        <div class="officer-stat-card__icon officer-stat-card__icon--amber">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+        </div>
+        <div class="officer-stat-card__body">
+          <div class="officer-stat-card__value" id="profStatResolved">—</div>
+          <div class="officer-stat-card__label">Grievances Resolved</div>
+        </div>
+      </div>
+      <div class="officer-stat-card">
+        <div class="officer-stat-card__icon officer-stat-card__icon--red">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></svg>
+        </div>
+        <div class="officer-stat-card__body">
+          <div class="officer-stat-card__value" id="profStatSamples">—</div>
+          <div class="officer-stat-card__label">Samples Recorded</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right: Monthly performance -->
+  <div class="officer-detail-actions-col">
+    <div class="officer-card officer-status-card" style="padding:20px;">
+      <h3 class="officer-actions-card__title" style="margin-bottom:16px;">Monthly Applications</h3>
+      <div style="height:160px;">
+        <canvas id="profBarChart"></canvas>
+      </div>
+    </div>
+    <div class="officer-card officer-status-card" style="padding:20px;margin-top:0;">
+      <h3 class="officer-actions-card__title" style="margin-bottom:12px;">This Month</h3>
+      <div class="officer-meta-row"><span>New Applications</span><span id="profMonthApps">—</span></div>
+      <div class="officer-meta-row"><span>Grievances Filed</span><span id="profMonthGrv">—</span></div>
+      <div class="officer-meta-row"><span>Samples Recorded</span><span id="profMonthSamples">—</span></div>
+      <div class="officer-meta-row"><span>Inspections</span><span id="profMonthInsp">—</span></div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/officer_profile.js') }}"></script>
+{% endblock %}

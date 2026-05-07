@@ -91,7 +91,7 @@
           var appDoc = {
             appId:             appId,
             uid:               user.uid,
-            phone:             user.phoneNumber || '',
+            phone:             user.phoneNumber || userData.phone || '',
             displayName:       user.displayName || '',
             businessTypes:     userData.businessTypes     || [],
             foodTypes:         userData.foodTypes         || [],

@@ -13,7 +13,8 @@
 <!-- ── NAVBAR ──────────────────────────────────────────────── -->
 <nav class="navbar">
   <a href="/" class="navbar__logo">
-    <img src="{{ url_for('static', filename='images/fssai_logo.png') }}" alt="FSSAI" class="navbar__logo-img" />
+    <img src="{{ url_for('static', filename='images/foodproof_logo.png') }}?v=2" alt="FOODPROOF" class="navbar__logo-img" />
+    <span class="navbar__logo-name">FOODPROOF</span>
   </a>
 
   <div class="navbar__links">
@@ -43,7 +44,7 @@
 <!-- ── FOOTER ─────────────────────────────────────────────── -->
 <footer class="footer">
   <div class="footer__brand">
-    <img src="{{ url_for('static', filename='images/fssai_logo.png') }}" alt="FSSAI" class="footer__logo-img" />
+    <img src="{{ url_for('static', filename='images/foodproof_logo.png') }}?v=2" alt="FOODPROOF" class="footer__logo-img" />
   </div>
   <nav class="footer__links">
     <a href="#">Privacy Policy</a>
@@ -84,6 +85,7 @@
           />
         </div>
         <button class="login-btn-cta" id="loginSendOtpBtn">Send OTP →</button>
+        <button class="login-btn-secondary" id="loginRegisterBtn" style="display:none;">Register New Application →</button>
         <p class="login-form-footer">New to FOSCOS? Use the <strong>Hello — How can we help?</strong> button on the home page.</p>
       </div>
     </div>
@@ -126,13 +128,13 @@
 
     <!-- FSSAI logo -->
     <div class="help-modal__logo">
-      <img src="{{ url_for('static', filename='images/fssai_logo.png') }}" alt="FSSAI" class="help-modal__logo-img" />
+      <img src="{{ url_for('static', filename='images/foodproof_logo.png') }}?v=2" alt="FOODPROOF" class="help-modal__logo-img" />
     </div>
 
     <h2 class="help-modal__title">Namaste! How can we help? 🙏</h2>
     <p class="help-modal__sub">Tell us who you are and we'll guide you from here.</p>
 
-    <div class="help-options">
+    <div class="help-options" id="helpMainOptions">
       <!-- FBO — auth-aware routing handled in auth.js -->
       <button class="help-option" id="btnHelpFbo">
         <span class="help-option__icon">🧑‍🍳</span>
@@ -160,6 +162,30 @@
         </div>
         <span class="help-option__arrow">→</span>
       </a>
+    </div>
+
+    <!-- FBO sub-menu — shown when user clicks Food Business (FBO) -->
+    <div id="helpFboSubMenu" style="display:none;">
+      <button class="help-sub-back" id="btnHelpFboBack">← Back</button>
+      <p class="help-modal__sub" style="margin-bottom:16px;">What would you like to do?</p>
+      <div class="help-options">
+        <button class="help-option" id="btnHelpTempLicense">
+          <span class="help-option__icon">⚡</span>
+          <div class="help-option__content">
+            <strong>Temporary / Basic License</strong>
+            <span>Quick 30 or 90-day registration for new businesses</span>
+          </div>
+          <span class="help-option__arrow">→</span>
+        </button>
+        <button class="help-option" id="btnHelpPermLicense">
+          <span class="help-option__icon">📜</span>
+          <div class="help-option__content">
+            <strong>Permanent License</strong>
+            <span>Full FSSAI license or registration for ongoing operations</span>
+          </div>
+          <span class="help-option__arrow">→</span>
+        </button>
+      </div>
     </div>
   </div>
 </div>

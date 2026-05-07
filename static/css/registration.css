@@ -347,6 +347,8 @@
   padding: 28px 24px;
   position: sticky;
   top: calc(var(--nav-h) + 60px);
+  max-height: calc(100vh - var(--nav-h) - 80px);
+  overflow-y: auto;
 }
 
 .reg-result-panel__amount {
@@ -1348,6 +1350,242 @@ select.reg-input { cursor: pointer; }
 }
 .reg-whatsapp-btn:hover { background: #1da853; }
 
+/* ── Sidebar hint text ──────────────────────────────────────── */
+.reg-docs-sidebar__hint {
+  font-size: 12px; color: var(--text-muted);
+  margin-top: 12px; line-height: 1.55;
+  border-top: 1px solid #f0eada;
+  padding-top: 10px;
+}
+
+/* ── New flat upload cards (documents page redesign) ────────── */
+.reg-doc-cards { display: flex; flex-direction: column; gap: 12px; }
+
+.reg-doc-card {
+  background: var(--white);
+  border: 1.5px solid #e0ddd5;
+  border-radius: 16px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.reg-doc-card:hover { box-shadow: 0 2px 12px rgba(28,43,74,.07); }
+
+.reg-doc-card.uploaded {
+  border-color: #3a9e60;
+  background: #f4fdf6;
+}
+
+.reg-doc-card__num {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: #f0eada;
+  border: 1.5px solid #d4cec4;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800; letter-spacing: .04em;
+  color: var(--navy);
+  flex-shrink: 0;
+  transition: background .2s, border-color .2s, color .2s;
+}
+
+.reg-doc-card.uploaded .reg-doc-card__num {
+  background: #edfaf0;
+  border-color: #3a9e60;
+  color: #3a9e60;
+  font-size: 15px;
+}
+
+.reg-doc-card__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.reg-doc-card__title {
+  font-size: 14px; font-weight: 700; color: var(--navy);
+  margin-bottom: 4px;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  line-height: 1.4;
+}
+
+.reg-doc-card__desc {
+  font-size: 12.5px; color: var(--text-muted); line-height: 1.55;
+}
+
+.reg-doc-card__status {
+  font-size: 12px; color: #3a9e60; font-weight: 600; margin-top: 5px;
+}
+
+.reg-doc-card__upload-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--navy);
+  color: var(--white);
+  border: none; border-radius: 10px;
+  padding: 9px 18px;
+  font-size: 13px; font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: background .15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.reg-doc-card__upload-btn:hover { background: #141e36; }
+.reg-doc-card__upload-btn.done { background: #3a9e60; }
+
+.reg-doc-card__file-input { display: none; }
+
+/* ── Accordion expand button ────────────────────────────────── */
+.reg-doc-card__expand-btn {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--cream-2);
+  border: 1.5px solid #e0ddd5;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  align-self: center;
+  color: var(--text-muted);
+  transition: background .15s, border-color .15s;
+  position: relative;
+}
+
+.reg-doc-card__expand-btn::after {
+  content: '';
+  display: block;
+  width: 7px; height: 7px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform .2s ease;
+}
+
+.reg-doc-card__expand-btn:hover {
+  background: #e8e5dc;
+  border-color: #c8c2b8;
+  color: var(--navy);
+}
+
+.reg-doc-card.expanded .reg-doc-card__expand-btn::after {
+  transform: rotate(-135deg) translateY(-2px);
+}
+
+/* ── Accordion detail panel ─────────────────────────────────── */
+.reg-doc-card__detail {
+  flex: 0 0 100%;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .32s ease;
+}
+
+.reg-doc-card.expanded .reg-doc-card__detail {
+  max-height: 560px;
+}
+
+.reg-doc-card__detail-body {
+  border-top: 1px solid #ece8e0;
+  margin-top: 4px;
+  padding-top: 16px;
+  padding-bottom: 4px;
+  padding-left: calc(38px + 16px);
+}
+
+.reg-doc-card__detail-text {
+  font-size: 13.5px;
+  color: var(--navy);
+  line-height: 1.65;
+  margin-bottom: 12px;
+}
+
+.reg-doc-card__detail-guidance {
+  font-size: 12.5px;
+  color: #5c4a2a;
+  line-height: 1.65;
+  background: #fff8ee;
+  border-left: 3px solid var(--amber);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+
+/* ── Helper buttons inside detail panel ─────────────────────── */
+.reg-doc-card__helper-btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-bottom: 2px;
+}
+
+.reg-doc-card__helper-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid #d4cec4;
+  background: var(--white);
+  color: var(--navy);
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color .15s, background .15s;
+}
+
+.reg-doc-card__helper-btn:hover {
+  border-color: var(--amber);
+  background: #fdf8f2;
+  color: var(--navy);
+}
+
+.reg-doc-card__helper-btn--lab {
+  border-color: #3a9e60;
+  color: #2d7a4a;
+  background: #edfaf0;
+}
+
+.reg-doc-card__helper-btn--lab:hover {
+  background: #d4f5e1;
+  border-color: #2d7a4a;
+}
+
+/* ── Documents CTA area (bottom, full-width) ────────────────── */
+.reg-docs-cta-area {
+  margin-top: 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.reg-docs-cta-main {
+  width: 100%;
+  max-width: 520px;
+  padding: 16px;
+  font-size: 16px;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.reg-docs-whatsapp-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: #1da853;
+  background: none;
+  border: 1.5px solid #25d366;
+  border-radius: 12px;
+  padding: 10px 24px;
+  font-size: 13.5px; font-weight: 600; font-family: var(--font-body);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .15s, color .15s;
+}
+.reg-docs-whatsapp-cta:hover { background: #25d366; color: var(--white); }
+
 /* ============================================================
    P12 — Payment method rows
    ============================================================ */
@@ -1442,8 +1680,17 @@ select.reg-input { cursor: pointer; }
   .reg-docs-layout { grid-template-columns: 1fr; }
   .reg-docs-sidebar { position: static; }
   .reg-photo-row { grid-template-columns: 1fr 1fr; }
+  .reg-doc-card { padding: 14px 16px; gap: 12px; }
 }
 @media (max-width: 560px) {
   .submitted-actions { grid-template-columns: 1fr; }
   .reg-photo-row { grid-template-columns: 1fr; }
+  .reg-doc-card__upload-btn {
+    align-self: flex-start;
+    margin-left: calc(38px + 12px);
+  }
+  .reg-doc-card__detail-body {
+    padding-left: 0;
+  }
+  .reg-docs-cta-main { font-size: 15px; }
 }

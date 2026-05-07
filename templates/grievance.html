@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#355070" />
+    <title>Consumer Grievance · Mobile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --navy: #355070; --navy-dark: #233a55; --navy-soft: #e7ecf2;
+        --sage: #aeb884; --sage-dark: #8a9465; --sage-soft: #eef1e4;
+        --cream: #fffde4; --cream-dark: #f3efcf;
+        --amber: #dfa36d; --amber-dark: #c38a56; --amber-soft: #fbe9d6;
+        --white: #ffffff; --text: #1f2a36; --muted: #6b7683;
+        --danger: #b03a2e; --border: #e3e6ec; --border-strong: #c9cfd8;
+        --shadow-sm: 0 1px 2px rgba(15,25,40,0.04);
+        --shadow: 0 2px 10px rgba(15,25,40,0.06);
+        --shadow-lg: 0 8px 24px rgba(15,25,40,0.08);
+        --radius: 12px; --radius-sm: 8px;
+        --font-serif: "DM Serif Display", Georgia, serif;
+        --font-sans: "DM Sans","Inter","Segoe UI",Roboto,Arial,sans-serif;
+      }
+      * { box-sizing: border-box; }
+      html, body { background: var(--cream); }
+      body {
+        margin: 0 auto; max-width: 480px;
+        font-family: var(--font-sans); color: var(--text);
+        line-height: 1.55; -webkit-font-smoothing: antialiased;
+        padding-bottom: env(safe-area-inset-bottom);
+      }
+      h1,h2,h3,h4 { font-family: var(--font-serif); font-weight: 400; color: var(--navy); }
+
+      .m-app { background: var(--cream); min-height: 100vh; padding-bottom: 100px; }
+      [data-view][hidden] { display: none; }
+
+      .m-header {
+        position: sticky; top: 0; z-index: 30;
+        background: var(--navy); color: var(--white);
+        padding: calc(14px + env(safe-area-inset-top)) 16px 14px;
+        display: flex; align-items: center; gap: 10px;
+        box-shadow: var(--shadow);
+      }
+      .m-header .icon-btn {
+        width: 36px; height: 36px; border-radius: 8px;
+        background: rgba(255,253,228,0.12); cursor: pointer; border: none;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 18px; color: var(--white); text-decoration: none;
+        position: relative;
+      }
+      .m-header .icon-btn .dot {
+        position: absolute; top: 6px; right: 6px;
+        width: 8px; height: 8px; border-radius: 50%;
+        background: var(--sage); border: 2px solid var(--navy);
+      }
+      .m-header .title { font-family: var(--font-serif); font-size: 17px; line-height: 1.2; flex: 1; }
+      .m-header .title small {
+        display: block; font-family: var(--font-sans);
+        font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+        color: rgba(255,253,228,0.7);
+      }
+
+      .m-container { padding: 16px 16px 0; display: flex; flex-direction: column; gap: 14px; }
+
+      .m-card {
+        background: var(--white); border: 1px solid var(--border);
+        border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow-sm);
+      }
+      .m-card h3 { margin: 0 0 6px; font-size: 17px; }
+      .muted { color: var(--muted); font-size: 13px; }
+      .muted-row { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 13px; }
+
+      .search-wrap {
+        display: flex; align-items: center; gap: 8px;
+        background: var(--white); border: 1px solid var(--border);
+        border-radius: 999px; padding: 6px 10px;
+        box-shadow: var(--shadow-sm);
+      }
+      .search-wrap span { color: var(--muted); }
+      .search-wrap input {
+        flex: 1; border: none; outline: none; background: transparent;
+        font-size: 15px; font-family: var(--font-sans); padding: 8px 4px; color: var(--text);
+      }
+      .section-row {
+        display: flex; align-items: center; justify-content: space-between;
+        margin: 6px 2px -4px; gap: 10px;
+      }
+      .section-row h3 { margin: 0; font-size: 16px; }
+      .section-row .pill {
+        font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 20px;
+        background: var(--sage-soft); color: var(--sage-dark); border: 1px solid var(--sage);
+      }
+
+      .resto-list { display: flex; flex-direction: column; gap: 10px; }
+      .resto-card {
+        display: flex; gap: 12px; align-items: center;
+        background: var(--white); border: 1px solid var(--border);
+        border-radius: var(--radius); padding: 12px 14px;
+        box-shadow: var(--shadow-sm); cursor: pointer;
+        transition: transform .12s, box-shadow .15s, border-color .15s;
+      }
+      .resto-card:active { transform: translateY(1px); }
+      .resto-card:hover { box-shadow: var(--shadow); border-color: var(--sage); }
+      .resto-mono {
+        width: 48px; height: 48px; border-radius: 10px; flex-shrink: 0;
+        background: linear-gradient(135deg, var(--sage-soft), var(--cream-dark));
+        color: var(--navy); font-family: var(--font-serif); font-size: 18px;
+        display: inline-flex; align-items: center; justify-content: center;
+      }
+      .resto-card .info { flex: 1; min-width: 0; }
+      .resto-card h4 {
+        margin: 0; font-family: var(--font-serif); font-size: 16px; color: var(--navy);
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+      .resto-card .line {
+        display: flex; align-items: center; gap: 6px;
+        font-size: 12px; color: var(--muted); margin-top: 2px;
+      }
+      .resto-card .meta-row {
+        display: flex; align-items: center; gap: 8px;
+        font-size: 11.5px; margin-top: 6px;
+      }
+      .resto-card .lic { color: var(--muted); font-size: 11px; }
+      .resto-card .rating-pill {
+        background: var(--cream-dark); border: 1px solid var(--border);
+        color: var(--navy); padding: 2px 8px; border-radius: 999px;
+        font-weight: 600; font-size: 11.5px;
+      }
+      .resto-card .rating-pill.high { background: var(--sage-soft); border-color: var(--sage); color: var(--sage-dark); }
+      .resto-card .rating-pill.low { background: var(--amber-soft); border-color: var(--amber); color: var(--amber-dark); }
+
+      .resto-row { display: flex; gap: 14px; align-items: center; }
+      .resto-row .resto-mono { width: 56px; height: 56px; font-size: 22px; border-radius: 12px; }
+      .resto-meta { flex: 1; min-width: 0; }
+      .resto-meta h2 { margin: 0 0 2px; font-family: var(--font-serif); font-size: 18px; }
+      .resto-meta .line { font-size: 12.5px; color: var(--muted); display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+      .hygiene-strip {
+        display: flex; align-items: center; justify-content: space-between; gap: 10px;
+        margin-top: 14px; padding: 10px 12px;
+        background: var(--sage-soft); border: 1px solid var(--sage);
+        border-radius: var(--radius-sm);
+      }
+      .hygiene-strip.low { background: var(--amber-soft); border-color: var(--amber); }
+      .hygiene-strip .score { font-family: var(--font-serif); font-size: 22px; color: var(--navy); line-height: 1; }
+      .hygiene-strip .label-small { font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+      .hygiene-tag {
+        background: var(--white); color: var(--sage-dark); border: 1px solid var(--sage);
+        font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 20px; white-space: nowrap;
+      }
+      .hygiene-strip.low .hygiene-tag { color: var(--amber-dark); border-color: var(--amber); }
+
+      .m-h { font-size: 17px; margin: 4px 0 -4px; display: flex; align-items: center; gap: 8px; }
+
+      .rating-block { display: flex; flex-direction: column; gap: 14px; }
+      .rating-row { background: var(--cream); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; }
+      .rating-row .head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-weight: 600; color: var(--navy); font-size: 14px; }
+      .stars-pick { display: flex; gap: 6px; }
+      .stars-pick .s {
+        flex: 1; background: var(--white); border: 1px solid var(--border-strong);
+        border-radius: 8px; padding: 10px 0; text-align: center; font-size: 22px;
+        cursor: pointer; color: #c8c8c8;
+        transition: background .12s, color .12s, border-color .12s;
+      }
+      .stars-pick .s.on { background: #fff7e6; border-color: var(--amber); color: var(--amber); }
+      .rating-row .pick-label { font-size: 12px; color: var(--muted); margin-top: 6px; text-align: center; }
+
+      .avg-mini {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-top: 4px; padding: 12px 14px;
+        background: linear-gradient(135deg, var(--navy), var(--navy-dark));
+        color: var(--white); border-radius: var(--radius);
+      }
+      .avg-mini .lab { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,253,228,0.7); }
+      .avg-mini .val { font-family: var(--font-serif); font-size: 28px; line-height: 1; margin-top: 2px; }
+      .avg-mini .right { color: var(--amber); font-size: 20px; letter-spacing: 2px; }
+
+      .m-section[hidden] { display: none; }
+
+      .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+      .upload-card { background: var(--cream); border: 1px dashed var(--border-strong); border-radius: var(--radius-sm); padding: 18px 10px; text-align: center; cursor: pointer; }
+      .upload-card .ic { font-size: 26px; }
+      .upload-card .lab { font-size: 12.5px; font-weight: 600; color: var(--navy); margin-top: 6px; }
+      .upload-card .req { font-size: 11px; color: var(--muted); margin-top: 2px; }
+      .upload-card input[type="file"] { display: none; }
+
+      .m-input, .m-textarea {
+        width: 100%; padding: 12px 14px; border: 1px solid var(--border-strong);
+        border-radius: var(--radius-sm); font-size: 15px; font-family: var(--font-sans);
+        background: var(--white); color: var(--text);
+      }
+      .m-input:focus, .m-textarea:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(53,80,112,0.12); }
+      .m-textarea { min-height: 88px; resize: vertical; }
+      .m-label { display: block; font-size: 12.5px; font-weight: 500; color: var(--navy); margin: 0 0 6px; }
+      .req-star { color: var(--danger); margin-left: 2px; }
+
+      .decl {
+        display: flex; gap: 10px; align-items: flex-start;
+        padding: 10px 12px; background: var(--cream); border: 1px solid var(--border);
+        border-radius: var(--radius-sm); margin-top: 10px; font-size: 13px; line-height: 1.5;
+      }
+      .decl input { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--navy); }
+
+      .cta-bar {
+        position: fixed; left: 0; right: 0; bottom: 0;
+        background: var(--white); border-top: 1px solid var(--border);
+        padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+        box-shadow: 0 -4px 16px rgba(15,25,40,0.06); z-index: 40;
+      }
+      .cta-bar .cta-inner { max-width: 480px; margin: 0 auto; display: flex; gap: 10px; }
+      .cta {
+        flex: 1; background: var(--amber); color: var(--white); border: none;
+        border-radius: 12px; padding: 16px; font-size: 16px;
+        font-family: var(--font-sans); font-weight: 600; cursor: pointer;
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      }
+      .cta:active { transform: translateY(1px); }
+      .cta.ghost { background: transparent; color: var(--navy); border: 1px solid var(--navy); }
+
+      .modal-mask {
+        position: fixed; inset: 0; z-index: 60; background: rgba(15,25,40,0.45);
+        display: flex; align-items: flex-end; justify-content: center; padding: 16px;
+      }
+      .modal-mask[hidden] { display: none; }
+      .success-sheet {
+        background: var(--white); width: 100%; max-width: 480px;
+        border-radius: 18px 18px 14px 14px; padding: 22px 18px 26px;
+        box-shadow: var(--shadow-lg); text-align: center;
+      }
+      .success-sheet .check {
+        width: 64px; height: 64px; border-radius: 50%;
+        background: var(--sage-soft); color: var(--sage-dark);
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 30px; margin-bottom: 10px;
+      }
+      .success-sheet h3 { font-size: 20px; margin: 0 0 4px; }
+      .success-sheet .id-pill {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: var(--cream); border: 1px solid var(--border); color: var(--navy);
+        padding: 8px 14px; border-radius: 20px; font-family: var(--font-serif);
+        font-size: 16px; margin: 14px 0 6px;
+      }
+      .success-sheet .actions { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }
+
+      .chip {
+        display: inline-flex; align-items: center; gap: 4px;
+        font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px;
+        border: 1px solid transparent; text-transform: uppercase; letter-spacing: .4px;
+      }
+      .chip.pending { background: var(--amber-soft); color: #8a5a2b; border-color: var(--amber); }
+      .chip.review  { background: var(--amber-soft); color: #8a5a2b; border-color: var(--amber); }
+      .chip.action  { background: var(--sage-soft); color: #4e5a30; border-color: var(--sage); }
+
+      .track-card {
+        background: var(--white); border: 1px solid var(--border);
+        border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow-sm);
+        cursor: pointer;
+      }
+      .track-card .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+      .track-card h4 { margin: 0 0 4px; font-family: var(--font-serif); font-size: 16px; color: var(--navy); }
+      .track-card .id { font-size: 12px; color: var(--muted); }
+
+      .timeline { display: flex; gap: 0; margin: 14px 0 4px; padding: 6px 0; }
+      .t-step { flex: 1; text-align: center; position: relative; }
+      .t-step .dot {
+        width: 30px; height: 30px; border-radius: 50%; margin: 0 auto 6px;
+        background: var(--white); border: 2px solid var(--border-strong);
+        display: flex; align-items: center; justify-content: center;
+        color: var(--muted); font-size: 13px; font-weight: 600;
+        position: relative; z-index: 1;
+      }
+      .t-step.done .dot { background: var(--sage-dark); border-color: var(--sage-dark); color: var(--white); }
+      .t-step.current .dot { background: var(--amber); border-color: var(--amber); color: var(--white); }
+      .t-step::after {
+        content: ""; position: absolute; top: 15px; right: -50%;
+        width: 100%; height: 2px; background: var(--border-strong); z-index: 0;
+      }
+      .t-step:last-child::after { display: none; }
+      .t-step.done::after { background: var(--sage-dark); }
+      .t-step .lab { font-size: 11.5px; color: var(--muted); font-weight: 500; }
+      .t-step.done .lab, .t-step.current .lab { color: var(--navy); font-weight: 600; }
+
+      .kv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+      .kv {
+        background: var(--cream); border: 1px solid var(--border);
+        border-radius: var(--radius-sm); padding: 10px 12px;
+      }
+      .kv .lab { font-size: 10.5px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+      .kv .val { font-size: 14px; font-weight: 600; color: var(--navy); margin-top: 2px; }
+
+      .empty {
+        text-align: center; padding: 28px 12px;
+        background: var(--white); border: 1px dashed var(--border-strong);
+        border-radius: var(--radius); color: var(--muted); font-size: 13.5px;
+      }
+      .feedback-tag {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 20px;
+        background: var(--sage-soft); color: var(--sage-dark); border: 1px solid var(--sage);
+        margin-top: 4px;
+      }
+      .feedback-tag.bad { background: var(--amber-soft); color: var(--amber-dark); border-color: var(--amber); }
+
+      /* OTP boxes */
+      .otp-boxes { display: flex; gap: 8px; justify-content: center; margin: 16px 0 6px; }
+      .otp-boxes input {
+        width: 40px; height: 50px; text-align: center; font-size: 20px;
+        font-family: var(--font-serif);
+        border: 1px solid var(--border-strong); border-radius: 8px;
+        background: var(--white); color: var(--navy);
+      }
+      .otp-boxes input:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(53,80,112,0.12); }
+
+      .acct-bar {
+        background: var(--white); border: 1px solid var(--border);
+        border-radius: var(--radius); padding: 10px 14px;
+        display: flex; align-items: center; gap: 10px;
+        box-shadow: var(--shadow-sm);
+      }
+      .acct-bar .av {
+        width: 36px; height: 36px; border-radius: 50%;
+        background: var(--sage-soft); color: var(--sage-dark);
+        display: inline-flex; align-items: center; justify-content: center; font-size: 16px;
+      }
+      .acct-bar .who { flex: 1; min-width: 0; }
+      .acct-bar .who .lab { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+      .acct-bar .who .ph { font-family: var(--font-serif); color: var(--navy); font-size: 15px; }
+      .acct-bar .signout {
+        border: 1px solid var(--navy); color: var(--navy);
+        background: transparent; border-radius: 999px;
+        padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;
+      }
+      .td-history-row {
+        display: flex; align-items: center;
+        padding: 6px 0; border-bottom: 1px solid var(--border);
+      }
+      .td-history-row:last-child { border-bottom: none; }
+    </style>
+  </head>
+  <body>
+    <div class="m-app">
+      <header class="m-header">
+        <button class="icon-btn" id="hdrBack" aria-label="Back" hidden>←</button>
+        <div class="title" id="hdrTitle">
+          Consumer Grievance
+          <small id="hdrSub">Food Safety &amp; Standards</small>
+        </div>
+        <button class="icon-btn" id="hdrAccount" aria-label="Account">
+          <span>👤</span><span class="dot" id="hdrAuthDot" hidden></span>
+        </button>
+      </header>
+
+      <!-- ============= HOME ============= -->
+      <section data-view="home">
+        <div class="m-container">
+          <div class="search-wrap">
+            <span>🔍</span>
+            <input id="searchInput" type="text" placeholder="Search restaurant or FSSAI license" />
+          </div>
+
+          <div class="section-row">
+            <h3>📍 Nearby Registered Restaurants</h3>
+            <span class="pill" id="restoCount"></span>
+          </div>
+
+          <div class="resto-list" id="restoList"></div>
+          <div class="empty" id="restoEmpty" hidden>No restaurant matches your search.</div>
+        </div>
+      </section>
+
+      <!-- ============= RATE / FILE GRIEVANCE ============= -->
+      <section data-view="rate" hidden>
+        <div class="m-container">
+          <section class="m-card">
+            <div class="resto-row">
+              <span class="resto-mono" id="rMono">--</span>
+              <div class="resto-meta">
+                <h2 id="rName">—</h2>
+                <div class="line" id="rLoc">📍 —</div>
+                <div class="line" id="rLic">🛡 FSSAI —</div>
+              </div>
+            </div>
+            <div class="hygiene-strip" id="hygieneStrip">
+              <div>
+                <div class="label-small">FSSAI Hygiene Score</div>
+                <div class="score"><span id="rRating">—</span> <span style="font-size:13px;color:var(--muted)">/ 5</span></div>
+              </div>
+              <span class="hygiene-tag" id="hygieneTag">⭐ —</span>
+            </div>
+          </section>
+
+          <h3 class="m-h">📝 Rate your experience</h3>
+          <section class="m-card">
+            <div class="rating-block">
+              <div class="rating-row">
+                <div class="head">🏢 Premise Cleanliness</div>
+                <div class="stars-pick" data-id="r1">
+                  <div class="s" data-v="1">★</div><div class="s" data-v="2">★</div>
+                  <div class="s" data-v="3">★</div><div class="s" data-v="4">★</div>
+                  <div class="s" data-v="5">★</div>
+                </div>
+                <div class="pick-label" data-for="r1">Tap to rate</div>
+              </div>
+              <div class="rating-row">
+                <div class="head">🍽 Food Freshness</div>
+                <div class="stars-pick" data-id="r2">
+                  <div class="s" data-v="1">★</div><div class="s" data-v="2">★</div>
+                  <div class="s" data-v="3">★</div><div class="s" data-v="4">★</div>
+                  <div class="s" data-v="5">★</div>
+                </div>
+                <div class="pick-label" data-for="r2">Tap to rate</div>
+              </div>
+              <div class="rating-row">
+                <div class="head">🧤 Staff Hygiene</div>
+                <div class="stars-pick" data-id="r3">
+                  <div class="s" data-v="1">★</div><div class="s" data-v="2">★</div>
+                  <div class="s" data-v="3">★</div><div class="s" data-v="4">★</div>
+                  <div class="s" data-v="5">★</div>
+                </div>
+                <div class="pick-label" data-for="r3">Tap to rate</div>
+              </div>
+
+              <div class="avg-mini">
+                <div>
+                  <div class="lab">Average</div>
+                  <div class="val" id="avgVal">—</div>
+                </div>
+                <div class="right" id="avgStars">☆☆☆☆☆</div>
+              </div>
+              <div style="text-align:center;">
+                <span class="feedback-tag" id="feedbackTag" hidden></span>
+              </div>
+            </div>
+          </section>
+
+          <section class="m-card m-section" id="badSection" hidden>
+            <h3>📷 Evidence (required)</h3>
+            <div class="muted-row">⚠ Low rating detected — please attach proof so the FSO can investigate.</div>
+            <div class="upload-grid">
+              <label class="upload-card">
+                <div class="ic">📷</div>
+                <div class="lab">Food photo</div>
+                <div class="req">Required</div>
+                <input type="file" accept="image/*" />
+              </label>
+              <label class="upload-card">
+                <div class="ic">🧾</div>
+                <div class="lab">Bill photo</div>
+                <div class="req">Required</div>
+                <input type="file" accept="image/*" />
+              </label>
+            </div>
+          </section>
+
+          <section class="m-card">
+            <label class="m-label" for="cat">📂 Complaint Category <span class="req-star">*</span></label>
+            <select id="cat" class="m-input">
+              <option value="">Select a category…</option>
+              <option value="hygiene">Hygiene</option>
+              <option value="food-quality">Food Quality</option>
+              <option value="mislabelling">Mislabelling</option>
+              <option value="adulteration">Adulteration</option>
+            </select>
+          </section>
+
+          <section class="m-card">
+            <label class="m-label" for="cmt">💬 Tell us more (optional)</label>
+            <textarea id="cmt" class="m-textarea" placeholder="Describe your experience…"></textarea>
+          </section>
+
+          <section class="m-card">
+            <h3>👤 Your details</h3>
+            <label class="m-label" for="nm">Full name <span class="req-star">*</span></label>
+            <input id="nm" class="m-input" type="text" placeholder="As per ID proof" />
+            <label class="m-label" for="ph" style="margin-top: 12px">Phone number <span class="req-star">*</span></label>
+            <input id="ph" class="m-input" type="tel" placeholder="+91 XXXXX XXXXX" />
+          </section>
+
+          <section class="m-card">
+            <h3>📜 Self declaration</h3>
+            <label class="decl">
+              <input type="checkbox" id="d1" />
+              <span>I declare that the information and evidence I have provided is true to the best of my knowledge.</span>
+            </label>
+            <label class="decl">
+              <input type="checkbox" id="d2" />
+              <span>I am willing to be contacted by the Food Safety Officer (FSO) for further investigation.</span>
+            </label>
+          </section>
+        </div>
+
+        <div class="cta-bar">
+          <div class="cta-inner">
+            <button class="cta" id="submitBtn">📤 Submit Grievance</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============= ACCOUNT — LOGIN ============= -->
+      <section data-view="login" hidden>
+        <div class="m-container">
+          <div class="m-card">
+            <h3>👤 Sign In</h3>
+            <p class="muted" style="margin-top: 4px">
+              Enter your phone number to view past grievances and updates.
+            </p>
+
+            <div id="loginPhoneStep">
+              <label class="m-label" for="loginPhone" style="margin-top: 10px">Phone number</label>
+              <input id="loginPhone" class="m-input" type="tel" placeholder="+91 XXXXX XXXXX" />
+            </div>
+
+            <div id="loginOtpStep" hidden>
+              <p class="muted" style="margin-top: 10px">
+                6-digit code sent to <strong id="loginOtpPhone"></strong>.
+              </p>
+              <div class="otp-boxes" id="loginOtpBoxes">
+                <input type="text" inputmode="numeric" maxlength="1" />
+                <input type="text" inputmode="numeric" maxlength="1" />
+                <input type="text" inputmode="numeric" maxlength="1" />
+                <input type="text" inputmode="numeric" maxlength="1" />
+                <input type="text" inputmode="numeric" maxlength="1" />
+                <input type="text" inputmode="numeric" maxlength="1" />
+              </div>
+              <p class="muted" style="text-align:center; font-size: 11.5px; margin-top: 4px">
+                Demo mode — any 6 digits will verify.
+              </p>
+              <p class="muted" style="text-align:center; font-size: 12px; margin-top: 8px">
+                <a href="#" id="loginChangePhone" style="color: var(--navy)">← Change phone number</a>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="cta-bar">
+          <div class="cta-inner">
+            <button class="cta" id="loginCta">🔑 Send OTP</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============= ACCOUNT — DASHBOARD (My Complaints) ============= -->
+      <section data-view="track-list" hidden>
+        <div class="m-container">
+          <div class="acct-bar">
+            <span class="av">👤</span>
+            <div class="who">
+              <div class="lab">Signed in</div>
+              <div class="ph" id="acctPhone">—</div>
+            </div>
+            <button class="signout" id="signOutBtn">Sign out</button>
+          </div>
+
+          <div class="section-row">
+            <h3>🗂 My Complaints</h3>
+            <span class="pill" id="trkCount" style="background:var(--navy-soft); color:var(--navy); border-color:#c0ccdc"></span>
+          </div>
+          <div id="trkList"></div>
+          <div class="empty" id="trkEmpty" hidden>No complaints filed yet. File one from the home page.</div>
+        </div>
+      </section>
+
+      <!-- ============= TRACK DETAIL ============= -->
+      <section data-view="track-detail" hidden>
+        <div class="m-container">
+          <section class="m-card">
+            <div class="resto-row">
+              <span class="resto-mono" id="tdMono">--</span>
+              <div class="resto-meta">
+                <h2 id="tdName">—</h2>
+                <div class="line" id="tdId">📄 —</div>
+                <div class="line" id="tdDate">⏱ —</div>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; justify-content: space-between; margin-top: 10px;">
+              <span id="tdChip"></span>
+              <span style="font-family: var(--font-serif); font-size: 18px; color: var(--navy)">
+                <span id="tdRating">—</span> <span style="font-size:12px;color:var(--muted)">/ 5</span>
+              </span>
+            </div>
+
+            <h4 style="margin: 14px 0 4px; font-family: var(--font-serif); color: var(--navy); font-size: 14px">📈 Progress</h4>
+            <div class="timeline" id="tdTimeline"></div>
+
+            <div class="kv-grid" id="tdRatings"></div>
+            <p class="muted" id="tdComment" style="margin-top: 10px"></p>
+          </section>
+
+          <!-- Inspection date (shown when scheduled) -->
+          <section class="m-card" id="tdInspectionCard" hidden>
+            <h3>📋 Inspection Scheduled</h3>
+            <div class="muted-row" style="margin-top: 6px"><span>📅</span> <span id="tdInspectionDate">—</span></div>
+            <div class="muted-row" style="margin-top: 4px"><span>👮</span> Food Safety Officer will visit the premises</div>
+          </section>
+
+          <!-- FBO response (shown when submitted) -->
+          <section class="m-card" id="tdFboResponseCard" hidden>
+            <h3>🏪 Restaurant Response</h3>
+            <div id="tdFboResponseText" style="margin-top: 8px; font-size: 14px; line-height: 1.55; color: var(--text)"></div>
+            <div id="tdFboResponseMeta" style="margin-top: 6px; font-size: 11.5px; color: var(--muted)"></div>
+          </section>
+
+          <!-- Status history -->
+          <section class="m-card" id="tdHistoryCard">
+            <h3>🕒 Status Updates</h3>
+            <div id="tdHistory" style="margin-top: 8px"></div>
+          </section>
+
+          <section class="m-card">
+            <h3>🏛 Assigned Officer</h3>
+            <div class="muted-row" style="margin-top: 4px"><span>👮</span> Mr. Banshan Lyngdoh</div>
+            <div class="muted-row" style="margin-top: 4px"><span>🏢</span> FSSAI Regional Office, Police Bazar, Shillong</div>
+            <div class="muted-row" style="margin-top: 4px"><span>📞</span> +91-364-222-1111</div>
+          </section>
+        </div>
+
+        <div class="cta-bar">
+          <div class="cta-inner">
+            <button class="cta ghost" id="tdBack">← Back</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Success sheet -->
+    <div class="modal-mask" id="successSheet" hidden>
+      <div class="success-sheet">
+        <div class="check">✔</div>
+        <h3>Grievance submitted</h3>
+        <div class="muted">Thank you for keeping food safe in Shillong.</div>
+        <div class="id-pill" id="sucId">📄 GRV-2026-XXXXX</div>
+        <div class="muted">Status: <strong>Submitted</strong> · Filed today</div>
+        <div class="actions">
+          <button class="cta" id="sucTrack">🕒 Track Complaint</button>
+          <button class="cta ghost" id="sucHome">Back to Home</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script>
+      /* ======== Restaurants (loaded from Firestore — approved applications) ======== */
+      let allRestaurants = [];
+
+      /* ======== Auth (mock — localStorage only) ======== */
+      const AUTH_KEY = "cgpMobileAuthPhone";
+      const getAuth = () => localStorage.getItem(AUTH_KEY) || "";
+      const setAuth = (p) => localStorage.setItem(AUTH_KEY, p || "");
+      const clearAuth = () => localStorage.removeItem(AUTH_KEY);
+
+      let db = null;
+      let myComplaintsList = [];
+
+      /* ======== View routing ======== */
+      function showView(v) {
+        document.querySelectorAll("[data-view]").forEach((el) => { el.hidden = el.dataset.view !== v; });
+        const back = document.getElementById("hdrBack");
+        const title = document.getElementById("hdrTitle");
+        const sub = document.getElementById("hdrSub");
+        const labels = {
+          home: ["Consumer Grievance", "Food Safety & Standards"],
+          rate: ["File a Grievance", "Food Safety & Standards"],
+          login: ["Sign In", "Account access"],
+          "track-list": ["My Complaints", "Account dashboard"],
+          "track-detail": ["Complaint Status", "Account dashboard"],
+        };
+        const [t, s] = labels[v] || labels.home;
+        title.firstChild.nodeValue = t;
+        sub.textContent = s;
+        back.hidden = (v === "home");
+        window.scrollTo({ top: 0 });
+      }
+      function refreshAuthDot() {
+        document.getElementById("hdrAuthDot").hidden = !getAuth();
+      }
+      document.getElementById("hdrBack").addEventListener("click", () => {
+        const cur = document.querySelector("[data-view]:not([hidden])").dataset.view;
+        if (cur === "track-detail") showView("track-list");
+        else showView("home");
+      });
+      document.getElementById("hdrAccount").addEventListener("click", () => {
+        if (getAuth()) {
+          renderTrackList();
+          showView("track-list");
+        } else {
+          // reset login form
+          document.getElementById("loginPhoneStep").hidden = false;
+          document.getElementById("loginOtpStep").hidden = true;
+          document.getElementById("loginCta").textContent = "🔑 Send OTP";
+          document.querySelectorAll("#loginOtpBoxes input").forEach((i) => (i.value = ""));
+          showView("login");
+        }
+      });
+
+      /* ======== Home: list + search ======== */
+      const initials = (n) => n.split(/\s+/).map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
+      const ratingClass = (r) => r >= 4 ? "high" : r < 3 ? "low" : "";
+
+      function renderRestaurants(list) {
+        const root = document.getElementById("restoList");
+        const empty = document.getElementById("restoEmpty");
+        document.getElementById("restoCount").textContent = `${list.length} listings`;
+        if (!list.length) { root.innerHTML = ""; empty.hidden = false; return; }
+        empty.hidden = true;
+        root.innerHTML = list.map((r) => `
+          <div class="resto-card" data-id="${r.id}">
+            <span class="resto-mono">${initials(r.name)}</span>
+            <div class="info">
+              <h4>${r.name}</h4>
+              <div class="line">📍 ${r.area}</div>
+              <div class="meta-row">
+                <span class="rating-pill ${ratingClass(r.rating)}">⭐ ${r.rating.toFixed(1)}</span>
+                <span class="lic">🛡 ${r.license}</span>
+              </div>
+            </div>
+            <span style="color: var(--muted); font-size: 18px">›</span>
+          </div>
+        `).join("");
+        root.querySelectorAll(".resto-card").forEach((card) => {
+          card.addEventListener("click", () => openRate(card.dataset.id));
+        });
+      }
+      function applySearch() {
+        const q = document.getElementById("searchInput").value.trim().toLowerCase();
+        if (!q) return renderRestaurants(allRestaurants);
+        renderRestaurants(allRestaurants.filter((r) =>
+          r.name.toLowerCase().includes(q) || r.license.toLowerCase().includes(q)
+        ));
+      }
+      document.getElementById("searchInput").addEventListener("input", applySearch);
+
+      /* ======== Rate / file flow ======== */
+      let currentResto = null;
+      const ratings = { r1: 0, r2: 0, r3: 0 };
+      const labels = ["", "Very Poor", "Poor", "Okay", "Good", "Excellent"];
+
+      function openRate(id) {
+        currentResto = allRestaurants.find((r) => r.id === id); if (!currentResto) return;
+        ratings.r1 = ratings.r2 = ratings.r3 = 0;
+        document.querySelectorAll(".stars-pick .s").forEach((el) => el.classList.remove("on"));
+        document.querySelectorAll(".pick-label").forEach((el) => (el.textContent = "Tap to rate"));
+        document.getElementById("avgVal").textContent = "—";
+        document.getElementById("avgStars").textContent = "☆☆☆☆☆";
+        document.getElementById("feedbackTag").hidden = true;
+        document.getElementById("badSection").hidden = true;
+        ["cmt", "nm", "ph"].forEach((id) => (document.getElementById(id).value = ""));
+        ["d1", "d2"].forEach((id) => (document.getElementById(id).checked = false));
+        // Pre-fill phone if signed in
+        if (getAuth()) document.getElementById("ph").value = getAuth();
+
+        document.getElementById("rMono").textContent = initials(currentResto.name);
+        document.getElementById("rName").textContent = currentResto.name;
+        document.getElementById("rLoc").innerHTML = `📍 ${currentResto.area}`;
+        document.getElementById("rLic").innerHTML = `🛡 FSSAI ${currentResto.license}`;
+        document.getElementById("rRating").textContent = currentResto.rating.toFixed(1);
+
+        const strip = document.getElementById("hygieneStrip");
+        const tag = document.getElementById("hygieneTag");
+        if (currentResto.rating >= 4) { strip.classList.remove("low"); tag.textContent = "⭐ High Hygiene"; }
+        else if (currentResto.rating < 3) { strip.classList.add("low"); tag.textContent = "⚠ Low Hygiene"; }
+        else { strip.classList.remove("low"); tag.textContent = "🌿 Average"; }
+        showView("rate");
+      }
+
+      function paintStars(rowId) {
+        const v = ratings[rowId];
+        document.querySelectorAll(`[data-id="${rowId}"] .s`).forEach((el) => {
+          const k = parseInt(el.dataset.v, 10);
+          el.classList.toggle("on", k <= v);
+        });
+        document.querySelector(`[data-for="${rowId}"]`).textContent = v ? `${labels[v]} (${v}/5)` : "Tap to rate";
+      }
+      function recompute() {
+        const arr = [ratings.r1, ratings.r2, ratings.r3].filter(Boolean);
+        const avg = arr.length === 3 ? (ratings.r1 + ratings.r2 + ratings.r3) / 3 : 0;
+        document.getElementById("avgVal").textContent = arr.length === 3 ? avg.toFixed(1) : "—";
+        const full = Math.round(avg);
+        let s = ""; for (let i = 0; i < 5; i++) s += i < full ? "★" : "☆";
+        document.getElementById("avgStars").textContent = s;
+        const tag = document.getElementById("feedbackTag"), bad = document.getElementById("badSection");
+        if (arr.length < 3) { tag.hidden = true; bad.hidden = true; return; }
+        const isBad = avg < 3;
+        tag.hidden = false;
+        if (isBad) { tag.classList.add("bad"); tag.textContent = "⚠ Complaint flow — evidence required"; bad.hidden = false; }
+        else { tag.classList.remove("bad"); tag.textContent = "👍 Positive feedback flow"; bad.hidden = true; }
+      }
+      document.querySelectorAll(".stars-pick").forEach((row) => {
+        row.addEventListener("click", (e) => {
+          const tile = e.target.closest(".s"); if (!tile) return;
+          ratings[row.dataset.id] = parseInt(tile.dataset.v, 10);
+          paintStars(row.dataset.id); recompute();
+        });
+      });
+      document.querySelectorAll(".upload-card input[type=file]").forEach((inp) => {
+        inp.addEventListener("change", (e) => {
+          const lab = inp.closest(".upload-card").querySelector(".lab");
+          const req = inp.closest(".upload-card").querySelector(".req");
+          if (e.target.files && e.target.files[0]) {
+            lab.textContent = "✅ Uploaded";
+            req.textContent = e.target.files[0].name;
+          }
+        });
+      });
+
+      const genId = () => "GRV-" + new Date().getFullYear() + "-" + String(Math.floor(10000 + Math.random() * 90000));
+
+      document.getElementById("submitBtn").addEventListener("click", () => {
+        const arr = [ratings.r1, ratings.r2, ratings.r3].filter(Boolean);
+        if (arr.length < 3) return alert("Please rate all three parameters.");
+        const nm = document.getElementById("nm").value.trim();
+        const ph = document.getElementById("ph").value.trim();
+        const cat = document.getElementById("cat").value;
+        if (!nm || !ph) return alert("Please enter your name and phone number.");
+        if (!cat) return alert("Please select a complaint category.");
+        if (!document.getElementById("d1").checked || !document.getElementById("d2").checked)
+          return alert("Please confirm both self-declaration statements.");
+        if (!db) return alert("Not connected. Please try again in a moment.");
+
+        const avg = (ratings.r1 + ratings.r2 + ratings.r3) / 3;
+        const grvId = genId();
+        const rec = {
+          id: grvId,
+          restaurantId: currentResto.id,
+          restaurantName: currentResto.name,
+          category: cat,
+          ratings: { cleanliness: ratings.r1, freshness: ratings.r2, hygiene: ratings.r3 },
+          overall: parseFloat(avg.toFixed(2)),
+          comment: document.getElementById("cmt").value.trim(),
+          consumerName: nm,
+          consumerPhone: ph,
+          status: "Submitted",
+          filedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        };
+        const badSection = document.getElementById("badSection");
+        if (!badSection.hidden) {
+          const evidenceFiles = [];
+          document.querySelectorAll("#badSection .upload-card input[type=file]").forEach((inp) => {
+            if (inp.files && inp.files[0]) {
+              evidenceFiles.push({ fileName: inp.files[0].name, uploadedAt: new Date().toISOString() });
+            }
+          });
+          if (evidenceFiles.length) rec.consumerEvidence = evidenceFiles;
+        }
+
+        db.collection("grievances").add(rec)
+          .then(docRef => {
+            const localRec = Object.assign({}, rec, {
+              _id: docRef.id,
+              filedAt: { toDate: () => new Date(), seconds: Date.now() / 1000 },
+            });
+            myComplaintsList.unshift(localRec);
+            document.getElementById("sucId").textContent = "📄 " + grvId;
+            document.getElementById("successSheet").hidden = false;
+            document.getElementById("sucTrack").onclick = () => {
+              document.getElementById("successSheet").hidden = true;
+              openTrackDetail(grvId);
+            };
+            document.getElementById("sucHome").onclick = () => {
+              document.getElementById("successSheet").hidden = true;
+              showView("home");
+            };
+          })
+          .catch(err => {
+            console.error("[grievance] submit failed:", err);
+            alert("Could not submit your complaint. Please check your connection and try again.");
+          });
+      });
+
+      /* ======== Login ======== */
+      function focusFirstOtp() {
+        const first = document.querySelector("#loginOtpBoxes input");
+        if (first) setTimeout(() => first.focus(), 30);
+      }
+      document.querySelectorAll("#loginOtpBoxes input").forEach((box, idx, all) => {
+        box.addEventListener("input", () => {
+          box.value = box.value.replace(/\D/g, "").slice(0, 1);
+          if (box.value && idx < all.length - 1) all[idx + 1].focus();
+        });
+        box.addEventListener("keydown", (e) => {
+          if (e.key === "Backspace" && !box.value && idx > 0) all[idx - 1].focus();
+        });
+      });
+
+      document.getElementById("loginCta").addEventListener("click", () => {
+        const phoneStep = document.getElementById("loginPhoneStep");
+        const otpStep = document.getElementById("loginOtpStep");
+        if (!phoneStep.hidden) {
+          // Step 1 → send OTP (dummy)
+          const ph = document.getElementById("loginPhone").value.trim();
+          if (!/^\+?\d{10,13}$/.test(ph.replace(/\s|-/g, "")))
+            return alert("Please enter a valid phone number.");
+          document.getElementById("loginOtpPhone").textContent = ph;
+          phoneStep.hidden = true;
+          otpStep.hidden = false;
+          document.getElementById("loginCta").textContent = "✔ Verify OTP";
+          focusFirstOtp();
+        } else {
+          // Step 2 → verify (any 6 digits)
+          const code = Array.from(document.querySelectorAll("#loginOtpBoxes input")).map((b) => b.value).join("");
+          if (code.length !== 6) return alert("Please enter all 6 digits.");
+          const ph = document.getElementById("loginOtpPhone").textContent;
+          setAuth(ph);
+          refreshAuthDot();
+          // Create consumer record on first login (idempotent)
+          if (db) {
+            const phoneKey = ph.replace(/\D/g, "").slice(-10);
+            db.collection("consumers").doc(phoneKey).set({ phone: phoneKey, createdAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
+              .catch(err => console.warn("[grievance] consumer record:", err));
+          }
+          renderTrackList();
+          showView("track-list");
+        }
+      });
+      document.getElementById("loginChangePhone").addEventListener("click", (e) => {
+        e.preventDefault();
+        document.getElementById("loginOtpStep").hidden = true;
+        document.getElementById("loginPhoneStep").hidden = false;
+        document.getElementById("loginCta").textContent = "🔑 Send OTP";
+      });
+
+      document.getElementById("signOutBtn").addEventListener("click", () => {
+        clearAuth();
+        refreshAuthDot();
+        showView("home");
+      });
+
+      /* ======== Track ======== */
+      function statusChip(s) {
+        const cls = s === "Resolved" || s === "Action Taken" ? "action" : s === "Under Review" || s === "Inspection Scheduled" ? "review" : "pending";
+        const emoji = s === "Resolved" ? "✅" : s === "Action Taken" ? "🛡" : s === "Inspection Scheduled" ? "📋" : s === "Under Review" ? "🔎" : "⏱";
+        return `<span class="chip ${cls}">${emoji} ${s}</span>`;
+      }
+      function renderTrackList() {
+        const phone = getAuth();
+        document.getElementById("acctPhone").textContent = phone || "—";
+        const root = document.getElementById("trkList");
+        const empty = document.getElementById("trkEmpty");
+        document.getElementById("trkCount").textContent = "Loading…";
+        root.innerHTML = '<div class="empty" style="border:none;">Loading complaints…</div>';
+        empty.hidden = true;
+
+        if (!db || !phone) {
+          root.innerHTML = "";
+          empty.textContent = "No complaints found.";
+          empty.hidden = false;
+          document.getElementById("trkCount").textContent = "0 total";
+          return;
+        }
+
+        db.collection("grievances")
+          .where("consumerPhone", "==", phone)
+          .get()
+          .then(snap => {
+            myComplaintsList = snap.docs
+              .map(d => ({ _id: d.id, ...d.data() }))
+              .sort((a, b) => {
+                const ta = a.filedAt && a.filedAt.seconds ? a.filedAt.seconds : 0;
+                const tb = b.filedAt && b.filedAt.seconds ? b.filedAt.seconds : 0;
+                return tb - ta;
+              });
+            const list = myComplaintsList;
+            document.getElementById("trkCount").textContent = `${list.length} total`;
+            if (!list.length) { root.innerHTML = ""; empty.hidden = false; return; }
+            empty.hidden = true;
+            root.innerHTML = list.map(c => {
+              const filed = c.filedAt && c.filedAt.toDate
+                ? c.filedAt.toDate().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
+                : "—";
+              return `
+                <div class="track-card" data-id="${c.id}" style="margin-bottom: 10px">
+                  <div class="top">
+                    <div>
+                      <h4>${c.restaurantName}</h4>
+                      <div class="id">📄 ${c.id}</div>
+                      <div class="id">⏱ Filed ${filed}</div>
+                    </div>
+                    <div style="text-align:right">
+                      <div style="font-family:var(--font-serif); color: var(--navy); font-size: 16px">⭐ ${c.overall.toFixed(1)}</div>
+                      <div style="margin-top: 6px">${statusChip(c.status)}</div>
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join("");
+            root.querySelectorAll(".track-card").forEach(card => {
+              card.addEventListener("click", () => openTrackDetail(card.dataset.id));
+            });
+          })
+          .catch(err => {
+            console.error("[grievance] load complaints:", err);
+            root.innerHTML = "";
+            empty.textContent = "Could not load complaints. Try again.";
+            empty.hidden = false;
+            document.getElementById("trkCount").textContent = "—";
+          });
+      }
+      function openTrackDetail(id) {
+        const c = myComplaintsList.find(x => x.id === id);
+        if (!c) { showView("track-list"); return; }
+        document.getElementById("tdMono").textContent = initials(c.restaurantName);
+        document.getElementById("tdName").textContent = c.restaurantName;
+        document.getElementById("tdId").innerHTML = `📄 ${c.id}`;
+        const filed = c.filedAt && c.filedAt.toDate
+          ? c.filedAt.toDate().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
+          : "—";
+        document.getElementById("tdDate").innerHTML = `⏱ Filed ${filed}`;
+        document.getElementById("tdChip").innerHTML = statusChip(c.status);
+        document.getElementById("tdRating").textContent = c.overall.toFixed(1);
+        document.getElementById("tdComment").textContent = c.comment || "";
+
+        const STATUS_ORDER = ["Submitted", "Under Review", "Inspection Scheduled", "Action Taken", "Resolved"];
+        const reached = STATUS_ORDER.indexOf(c.status);
+        const currentIdx = reached < 0 ? 0 : reached;
+        const stages = [
+          { lab: "Submitted", emo: "📤" },
+          { lab: "Under Review", emo: "🔎" },
+          { lab: "Inspection", emo: "📋" },
+          { lab: "Action Taken", emo: "🛡" },
+          { lab: "Resolved", emo: "✅" },
+        ];
+        document.getElementById("tdTimeline").innerHTML = stages.map((s, i) => {
+          let state = "";
+          if (i < currentIdx) state = "done";
+          else if (i === currentIdx) state = currentIdx === stages.length - 1 ? "done" : "current";
+          const dotContent = state === "done" ? "✓" : state === "current" ? s.emo : i + 1;
+          return `<div class="t-step ${state}"><div class="dot">${dotContent}</div><div class="lab">${s.lab}</div></div>`;
+        }).join("");
+
+        const r = c.ratings || {};
+        document.getElementById("tdRatings").innerHTML = `
+          <div class="kv"><div class="lab">Premise</div><div class="val">${r.cleanliness || "—"} / 5</div></div>
+          <div class="kv"><div class="lab">Freshness</div><div class="val">${r.freshness || "—"} / 5</div></div>
+          <div class="kv"><div class="lab">Hygiene</div><div class="val">${r.hygiene || "—"} / 5</div></div>
+        `;
+
+        // Inspection date
+        const inspCard = document.getElementById("tdInspectionCard");
+        if (c.inspectionDate) {
+          document.getElementById("tdInspectionDate").textContent = c.inspectionDate;
+          inspCard.hidden = false;
+        } else {
+          inspCard.hidden = true;
+        }
+
+        // FBO response — not shown to consumer (FSO-only)
+        document.getElementById("tdFboResponseCard").hidden = true;
+
+        // Status history
+        const hist = c.statusHistory;
+        const histEl = document.getElementById("tdHistory");
+        if (hist && hist.length) {
+          const sorted = hist.slice().sort((a, b) => {
+            const ta = a.changedAt && a.changedAt.seconds ? a.changedAt.seconds : 0;
+            const tb = b.changedAt && b.changedAt.seconds ? b.changedAt.seconds : 0;
+            return tb - ta;
+          });
+          histEl.innerHTML = sorted.map(h => {
+            const when = h.changedAt && h.changedAt.toDate
+              ? h.changedAt.toDate().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
+              : "—";
+            return `<div class="td-history-row">${statusChip(h.status)} <span class="muted" style="font-size:12px;margin-left:6px">${when}</span></div>`;
+          }).join("");
+        } else {
+          histEl.innerHTML = '<div class="muted" style="font-size:13px">No status updates yet.</div>';
+        }
+
+        showView("track-detail");
+      }
+      document.getElementById("tdBack").addEventListener("click", () => showView("track-list"));
+
+      /* ======== Boot ======== */
+      refreshAuthDot();
+      showView("home");
+      document.getElementById("restoList").innerHTML =
+        '<div style="text-align:center;padding:32px;color:var(--muted);font-size:13.5px;">Loading restaurants…</div>';
+
+      fetch('/api/firebase-config')
+        .then(res => res.json())
+        .then(config => {
+          if (!firebase.apps.length) firebase.initializeApp(config);
+          db = firebase.firestore();
+          return db.collection('applications')
+            .where('applicationStatus', '==', 'approved')
+            .get();
+        })
+        .then(snap => {
+          allRestaurants = snap.docs
+            .map(doc => {
+              const d = doc.data();
+              const det = d.details || {};
+              const area = [det.addrLine1, det.addrDistrict].filter(Boolean).join(', ');
+              return {
+                id:      d.appId,
+                name:    det.bizName || '—',
+                area:    area || 'Shillong',
+                license: d.appId,
+                rating:  typeof d.fssaiRating === 'number' ? d.fssaiRating : 0,
+              };
+            })
+            .sort((a, b) => b.rating - a.rating);
+          renderRestaurants(allRestaurants);
+        })
+        .catch(err => {
+          console.error('[grievance] Firestore load:', err);
+          document.getElementById("restoList").innerHTML = '';
+          document.getElementById("restoEmpty").hidden = false;
+          document.getElementById("restoEmpty").textContent = 'Could not load restaurants. Check your connection and try again.';
+          document.getElementById("restoCount").textContent = '';
+        });
+    </script>
+  </body>
+</html>

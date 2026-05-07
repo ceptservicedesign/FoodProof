@@ -1,0 +1,139 @@
+{% extends "_base.html" %}
+{% block title %}Complaint Detail — FOSCOS{% endblock %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/fbo_portal.css') }}" />
+{% endblock %}
+
+{% block content %}
+<div class="fbo-page">
+
+  <!-- ── Header (compact) ── -->
+  <div class="fbo-grv-detail-header">
+    <div class="fbo-grv-detail-header__inner">
+      <div>
+        <a href="/fbo-grievances" class="track-header__back">← All Complaints</a>
+        <div class="fbo-grv-detail-header__id" id="gdHeaderId">—</div>
+        <div class="fbo-grv-detail-header__meta" id="gdHeaderMeta">—</div>
+      </div>
+      <div id="gdHeaderBadge"></div>
+    </div>
+  </div>
+
+  <!-- ── Status tracker ── -->
+  <div class="fbo-grv-tracker" id="gdPipeline">
+    <div class="fbo-grv-tracker__item" data-step="submitted">
+      <div class="fbo-grv-tracker__dot"></div>
+      <div class="fbo-grv-tracker__lbl">Submitted</div>
+    </div>
+    <div class="fbo-grv-tracker__seg"></div>
+    <div class="fbo-grv-tracker__item" data-step="under_review">
+      <div class="fbo-grv-tracker__dot"></div>
+      <div class="fbo-grv-tracker__lbl">Under Review</div>
+    </div>
+    <div class="fbo-grv-tracker__seg"></div>
+    <div class="fbo-grv-tracker__item" data-step="action_taken">
+      <div class="fbo-grv-tracker__dot"></div>
+      <div class="fbo-grv-tracker__lbl">Action Taken</div>
+    </div>
+    <div class="fbo-grv-tracker__seg"></div>
+    <div class="fbo-grv-tracker__item" data-step="inspection_scheduled">
+      <div class="fbo-grv-tracker__dot"></div>
+      <div class="fbo-grv-tracker__lbl">Inspection</div>
+    </div>
+    <div class="fbo-grv-tracker__seg"></div>
+    <div class="fbo-grv-tracker__item" data-step="resolved">
+      <div class="fbo-grv-tracker__dot"></div>
+      <div class="fbo-grv-tracker__lbl">Resolved</div>
+    </div>
+  </div>
+
+  <!-- ── Two-column layout ── -->
+  <div class="fbo-grv-detail-layout">
+
+    <!-- Left: Tabs (3 tabs) -->
+    <div class="fbo-grv-detail-card">
+      <div class="fbo-grv-tabs" id="gdTabs">
+        <button class="fbo-grv-tab active" data-tab="details">Complaint Details</button>
+        <button class="fbo-grv-tab" data-tab="response">Your Response</button>
+        <button class="fbo-grv-tab" data-tab="evidence">Evidence Upload</button>
+      </div>
+
+      <!-- Tab: Complaint Details + FSO history inline -->
+      <div class="fbo-grv-tab-panel active" id="tabDetails">
+        <div id="gdDetailsGrid">
+          <div style="color:var(--text-muted);font-size:13px;">Loading…</div>
+        </div>
+        <div class="fbo-grv-section-divider"></div>
+        <div class="fbo-grv-panel-label" style="margin-bottom:10px;">Status History</div>
+        <div id="gdHistory">
+          <div style="color:var(--text-muted);font-size:13px;">Loading…</div>
+        </div>
+      </div>
+
+      <!-- Tab: Your Response + classification -->
+      <div class="fbo-grv-tab-panel" id="tabResponse">
+        <div class="fbo-grv-panel-label" style="margin-bottom:8px;">Mark Complaint</div>
+        <div class="fbo-grv-classify-row" id="gdClassifyRow">
+          <button class="fbo-grv-classify-btn" data-val="genuine" id="gdClsGenuine">⚠ Genuine Complaint</button>
+          <button class="fbo-grv-classify-btn fbo-grv-classify-btn--fake" data-val="fake" id="gdClsFake">✕ Fake / Invalid</button>
+        </div>
+        <div class="fbo-grv-response-saved" id="gdClassifySaved" hidden></div>
+
+        <div class="fbo-grv-section-divider"></div>
+
+        <div id="gdResponseExisting" hidden>
+          <div class="fbo-grv-panel-label" style="margin-bottom:6px;">Submitted Response</div>
+          <div class="fbo-grv-response-submitted" id="gdResponseText"></div>
+          <div class="fbo-grv-response-meta" id="gdResponseMeta"></div>
+          <button class="fbo-grv-response-btn fbo-grv-edit-btn" id="gdResponseEdit" style="margin-top:12px;">Edit Response</button>
+        </div>
+        <div id="gdResponseForm">
+          <div class="fbo-grv-panel-label" style="margin-bottom:6px;">Your Response</div>
+          <textarea id="gdResponseInput" class="fbo-grv-response-input"
+            placeholder="Describe the steps you have taken or plan to take to address this complaint…" rows="5"></textarea>
+          <button class="fbo-grv-response-btn" id="gdResponseSubmit">Submit Response</button>
+          <div class="fbo-grv-response-saved" id="gdResponseSaved" hidden></div>
+        </div>
+      </div>
+
+      <!-- Tab: Evidence Upload -->
+      <div class="fbo-grv-tab-panel" id="tabEvidence">
+        <p class="fbo-grv-panel-label" style="margin-bottom:6px;">Upload Improvement Evidence</p>
+        <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:16px;line-height:1.5;">
+          Photos and documents uploaded here are visible only to FSSAI officers — not to the consumer.
+        </p>
+        <div class="fbo-grv-evidence-upload">
+          <input type="file" id="gdEvidenceFile" accept="image/*,.pdf" style="display:none;" />
+          <div class="fbo-grv-evidence-drop" id="gdEvidenceDrop">
+            <div style="font-size:28px;margin-bottom:8px;">📎</div>
+            <div style="font-size:13.5px;font-weight:600;color:var(--navy);margin-bottom:4px;">Choose a file</div>
+            <div style="font-size:12px;color:var(--text-muted);">Images or PDF — visible to FSO only</div>
+            <button class="fbo-grv-response-btn" id="gdEvidenceBrowse" style="margin-top:14px;width:auto;padding:10px 24px;">Browse Files</button>
+          </div>
+          <div id="gdEvidenceList" style="margin-top:16px;"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right: Status sidebar -->
+    <div class="fbo-grv-detail-sidebar">
+      <div class="fbo-right-box">
+        <div class="fbo-right-box__title">Current Status</div>
+        <div id="gdSidebarStatus" style="margin-bottom:16px;"></div>
+        <div class="fbo-grv-meta-row"><span>Filed</span><span id="gdMetaFiled">—</span></div>
+        <div class="fbo-grv-meta-row"><span>Category</span><span id="gdMetaCategory">—</span></div>
+        <div class="fbo-grv-meta-row"><span>Overall Rating</span><span id="gdMetaOverall">—</span></div>
+        <div class="fbo-grv-meta-row"><span>Inspection Date</span><span id="gdMetaInspection">—</span></div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+<script>window.__GRV_ID__ = {{ grv_id | tojson }};</script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/fbo_grievance_detail.js') }}"></script>
+{% endblock %}

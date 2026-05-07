@@ -54,30 +54,74 @@
     });
   }
 
-  // ── Verify OTP ───────────────────────────────────────────────
+  // ── Resume an existing registered user after OTP ─────────────
+  function resumeExistingUser(uid) {
+    var PORTAL_STATUSES = ['submitted','pending','approved','documents_requested',
+      'inspection_scheduled','inspection_complete','final_review'];
+    firebase.firestore().collection('users').doc(uid).get().then(function (doc) {
+      var d = doc.exists ? doc.data() : {};
+      if (PORTAL_STATUSES.indexOf(d.applicationStatus || '') !== -1
+          || d.applicationId || (d.tempLicense && d.tempLicense.licenseNo)) {
+        window.location.href = '/fbo-portal'; return;
+      }
+      if (sessionStorage.getItem('tlFlow') === '1') {
+        sessionStorage.removeItem('tlFlow');
+        var lastPage = sessionStorage.getItem('tlLastPage') || '/temp-license';
+        sessionStorage.removeItem('tlLastPage');
+        window.location.href = lastPage; return;
+      }
+      if (!d.businessTypes || !d.businessTypes.length) { window.location.href = '/about-business'; return; }
+      if (!d.foodTypes     || !d.foodTypes.length)     { window.location.href = '/food-type'; return; }
+      if (!d.scale         || !d.scale.tier)           { window.location.href = '/scale'; return; }
+      if (!d.details       || !d.details.bizName)      { window.location.href = '/business-details'; return; }
+      if (!d.documents)                                { window.location.href = '/documents'; return; }
+      if (!d.review)                                   { window.location.href = '/one-stop-shop?from=documents'; return; }
+      window.location.href = '/review';
+    }).catch(function () { showVerifiedThenName(); });
+  }
+
+  // ── Verify OTP (mock — always 123456) ───────────────────────
   function handleVerifyOtp() {
     var digits = document.querySelectorAll('.signup-otp-digit');
     var otp    = Array.from(digits).map(function (d) { return d.value; }).join('');
     if (otp.length !== 6) return;
 
-    var verificationId = sessionStorage.getItem('signup_verification_id');
-    if (!verificationId) {
-      setError('signupOtpError', 'Session expired. Please go back and try again.');
+    var phone = sessionStorage.getItem('signup_phone');
+    if (!phone) { window.location.href = '/signup'; return; }
+
+    if (otp !== '123456') {
+      setError('signupOtpError', 'Incorrect OTP. Enter 123456 to continue.');
+      digits.forEach(function (d) { d.value = ''; });
+      if (digits[0]) digits[0].focus();
       return;
     }
 
     setError('signupOtpError', '');
     setLoading('signupVerifyOtpBtn', true, 'Verifying');
 
-    var credential = firebase.auth.PhoneAuthProvider.credential(verificationId, otp);
+    var email    = 'mock+91' + phone + '@foscos.local';
+    var password = '123456';
 
-    firebase.auth().signInWithCredential(credential)
+    var isNewAccount = false;
+    firebase.auth().signInWithEmailAndPassword(email, password)
+      .catch(function (err) {
+        if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' ||
+            err.code === 'auth/invalid-email') {
+          isNewAccount = true;
+          return firebase.auth().createUserWithEmailAndPassword(email, password);
+        }
+        throw err;
+      })
       .then(function () {
-        showVerifiedThenName();
+        if (isNewAccount) {
+          showVerifiedThenName();
+        } else {
+          resumeExistingUser(firebase.auth().currentUser.uid);
+        }
       })
       .catch(function (err) {
-        console.error('[FOSCOS] verify OTP:', err);
-        setError('signupOtpError', 'Incorrect OTP. Please try again.');
+        console.error('[FOSCOS] mock signup verify:', err);
+        setError('signupOtpError', 'Could not verify. Please try again.');
         digits.forEach(function (d) { d.value = ''; });
         if (digits[0]) digits[0].focus();
         setLoading('signupVerifyOtpBtn', false, 'Verify & Continue →');
@@ -124,10 +168,18 @@
       return;
     }
 
+    var phone = sessionStorage.getItem('signup_phone') || '';
     user.updateProfile({ displayName: name })
       .then(function () {
         sessionStorage.removeItem('signup_verification_id');
         sessionStorage.removeItem('signup_phone');
+        return firebase.firestore().collection('users').doc(user.uid).set({
+          phone:       phone ? ('+91' + phone) : '',
+          displayName: name,
+          createdAt:   firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+      })
+      .then(function () {
         if (sessionStorage.getItem('tlFlow') === '1') {
           sessionStorage.removeItem('tlFlow');
           var lastPage = sessionStorage.getItem('tlLastPage') || '/temp-license';
@@ -144,24 +196,11 @@
       });
   }
 
-  // ── Resend OTP ───────────────────────────────────────────────
+  // ── Resend OTP (mock — just restart the timer) ───────────────
   function handleResendOtp() {
-    var phone = sessionStorage.getItem('signup_phone');
-    if (!phone) { window.location.href = '/signup'; return; }
-
+    if (!sessionStorage.getItem('signup_phone')) { window.location.href = '/signup'; return; }
     setError('signupOtpError', '');
-    clearInterval(resendInterval);
-
-    var rv = new firebase.auth.RecaptchaVerifier('signup-resend-recaptcha', { size: 'invisible' });
-    firebase.auth().signInWithPhoneNumber('+91' + phone, rv)
-      .then(function (result) {
-        sessionStorage.setItem('signup_verification_id', result.verificationId);
-        startResendTimer();
-      })
-      .catch(function () {
-        setError('signupOtpError', 'Failed to resend OTP. Try again.');
-        try { rv.clear(); } catch (_) {}
-      });
+    startResendTimer();
   }
 
   function startResendTimer() {
@@ -184,8 +223,8 @@
 
   // ── Init ─────────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', function () {
-    // Guard: if no verificationId in session, send back to signup
-    if (!sessionStorage.getItem('signup_verification_id')) {
+    // Guard: if no phone in session, send back to signup
+    if (!sessionStorage.getItem('signup_phone')) {
       window.location.href = '/signup';
       return;
     }

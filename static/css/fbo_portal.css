@@ -435,6 +435,493 @@
 }
 .fbo-new-app-btn:hover { background: var(--amber-hover); }
 
+/* ── Consumer Complaints (approved state) ── */
+.fbo-complaints-section {
+  max-width: 960px;
+  margin: 0 auto 32px;
+  padding: 0 24px;
+}
+.fbo-complaint-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+}
+.fbo-complaint-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.fbo-complaint-category {
+  background: var(--cream-2);
+  color: var(--navy);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  text-transform: capitalize;
+}
+.fbo-complaint-date {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.fbo-complaint-status {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.fbo-complaint-status--pending  { background: #fef9ec; color: #92600a; border: 1px solid #f5c96a; }
+.fbo-complaint-status--review   { background: #eef3ff; color: #2d4fa3; border: 1px solid #a5bbf5; }
+.fbo-complaint-status--done     { background: #ecf6ef; color: #1e6b3c; border: 1px solid #7bcb9c; }
+.fbo-complaint-ratings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.fbo-complaint-comment {
+  font-size: 13.5px;
+  color: var(--text-dark);
+  font-style: italic;
+  border-left: 3px solid var(--amber);
+  padding-left: 10px;
+  margin-top: 6px;
+}
+.fbo-complaints-empty {
+  color: var(--text-muted);
+  font-size: 13.5px;
+  padding: 20px;
+  background: var(--cream-2);
+  border-radius: 10px;
+  text-align: center;
+}
+.fbo-complaint-card--clickable {
+  cursor: pointer;
+  transition: box-shadow .15s, border-color .15s;
+}
+.fbo-complaint-card--clickable:hover {
+  box-shadow: 0 4px 16px rgba(28,43,74,.1);
+  border-color: var(--amber);
+}
+.fbo-complaint-footer {
+  margin-top: 10px;
+  font-size: 12.5px;
+}
+.fbo-complaint-responded { color: #1e6b3c; font-weight: 600; }
+.fbo-complaint-respond-cta { color: var(--amber); font-weight: 600; }
+
+/* ── FBO Complaint Detail Panel ── */
+.fbo-grv-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(28,43,74,.35);
+  z-index: 200;
+}
+.fbo-grv-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 380px;
+  background: var(--white);
+  box-shadow: -4px 0 24px rgba(28,43,74,.14);
+  z-index: 201;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.fbo-grv-panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--navy);
+  color: var(--white);
+  flex-shrink: 0;
+}
+.fbo-grv-panel-id {
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.6);
+  margin-bottom: 4px;
+}
+.fbo-grv-panel-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--white);
+}
+.fbo-grv-panel-close {
+  background: rgba(255,255,255,.12);
+  border: none;
+  color: var(--white);
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-left: 10px;
+}
+.fbo-grv-panel-close:hover { background: rgba(255,255,255,.22); }
+.fbo-grv-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+.fbo-grv-panel-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 3px;
+}
+.fbo-grv-panel-value {
+  font-size: 14px;
+  color: var(--navy);
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+.fbo-grv-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 16px 0;
+}
+.fbo-grv-panel-ratings { display: flex; flex-direction: column; gap: 8px; margin-bottom: 6px; }
+.fbo-grv-rating-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  padding: 8px 12px;
+  background: var(--cream-2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+.fbo-grv-panel-overall {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--navy);
+  padding: 10px;
+  background: #fef9ec;
+  border-radius: 7px;
+  margin-top: 4px;
+}
+.fbo-grv-comment-box {
+  font-size: 13.5px;
+  color: var(--text-dark);
+  font-style: italic;
+  border-left: 3px solid var(--amber);
+  padding-left: 10px;
+  margin-bottom: 4px;
+}
+.fbo-grv-history-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+.fbo-grv-history-row:last-child { border-bottom: none; }
+.fbo-grv-history-meta { font-size: 12px; color: var(--text-muted); }
+.fbo-grv-history-empty { font-size: 13px; color: var(--text-muted); font-style: italic; }
+.fbo-grv-response-submitted {
+  font-size: 13.5px;
+  color: var(--navy);
+  line-height: 1.5;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+}
+.fbo-grv-response-meta { font-size: 11px; color: var(--text-muted); }
+.fbo-grv-response-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-family: inherit;
+  color: var(--navy);
+  resize: vertical;
+  background: var(--white);
+}
+.fbo-grv-response-input:focus { outline: none; border-color: var(--amber); }
+.fbo-grv-response-btn {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+  background: var(--navy);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background .15s;
+}
+.fbo-grv-response-btn:hover { background: var(--amber); }
+.fbo-grv-response-saved {
+  text-align: center;
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #16a34a;
+}
+
+/* ============================================================
+   FBO Grievance List — empty state
+   ============================================================ */
+
+.fbo-grv-empty-state {
+  text-align: center;
+  padding: 60px 28px;
+  background: var(--white);
+  border: 1.5px solid #e0ddd5;
+  border-radius: 16px;
+  max-width: 560px;
+  margin: 0 auto;
+}
+.fbo-grv-empty-state__icon { font-size: 44px; margin-bottom: 14px; }
+.fbo-grv-empty-state__title { font-size: 18px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+.fbo-grv-empty-state__sub { font-size: 13.5px; color: var(--text-muted); line-height: 1.6; }
+
+/* ============================================================
+   FBO Grievance Detail — header
+   ============================================================ */
+
+.fbo-grv-detail-header {
+  background: var(--navy);
+  padding: 28px 40px;
+}
+
+.fbo-grv-detail-header__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.fbo-grv-detail-header__id {
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.55);
+  margin-bottom: 4px;
+}
+
+.fbo-grv-detail-header__meta {
+  font-size: 13px;
+  color: rgba(255,255,255,.65);
+  margin-top: 4px;
+  letter-spacing: 0;
+}
+
+/* ── Status tracker (dot + line style) ── */
+.fbo-grv-tracker {
+  display: flex;
+  align-items: flex-start;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 18px 40px;
+  background: var(--white);
+  border-bottom: 1px solid #e8e5dc;
+}
+
+.fbo-grv-tracker__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.fbo-grv-tracker__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #d4cec4;
+  background: var(--white);
+  transition: border-color .2s, background .2s, transform .2s;
+}
+
+.fbo-grv-tracker__lbl {
+  font-size: 11px;
+  font-weight: 600;
+  color: #aaa;
+  text-align: center;
+  white-space: nowrap;
+  transition: color .2s;
+}
+
+.fbo-grv-tracker__seg {
+  flex: 1;
+  height: 2px;
+  background: #e8e5dc;
+  margin-top: 5px;
+  transition: background .2s;
+}
+
+.fbo-grv-tracker__item.done .fbo-grv-tracker__dot  { background: #3a9e60; border-color: #3a9e60; }
+.fbo-grv-tracker__item.done .fbo-grv-tracker__lbl  { color: #3a9e60; }
+.fbo-grv-tracker__seg.done                         { background: #3a9e60; }
+.fbo-grv-tracker__item.active .fbo-grv-tracker__dot {
+  background: var(--amber);
+  border-color: var(--amber);
+  transform: scale(1.3);
+}
+.fbo-grv-tracker__item.active .fbo-grv-tracker__lbl { color: var(--navy); font-weight: 700; }
+
+/* ── Layout ── */
+.fbo-grv-detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 24px;
+  max-width: 1100px;
+  margin: 24px auto;
+  padding: 0 40px 80px;
+  align-items: start;
+}
+
+.fbo-grv-detail-card {
+  background: var(--white);
+  border: 1.5px solid #e0ddd5;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.fbo-grv-detail-sidebar { display: flex; flex-direction: column; gap: 16px; }
+
+/* ── Tabs inside card ── */
+.fbo-grv-tabs {
+  display: flex;
+  border-bottom: 2px solid #e8e5dc;
+}
+
+.fbo-grv-tab {
+  padding: 14px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  font-family: var(--font-body);
+  white-space: nowrap;
+  transition: color .15s, border-color .15s;
+}
+.fbo-grv-tab:hover { color: var(--navy); }
+.fbo-grv-tab.active { color: var(--navy); border-bottom-color: var(--amber); }
+
+.fbo-grv-tab-panel { display: none; padding: 24px; }
+.fbo-grv-tab-panel.active { display: block; }
+.fbo-grv-section-divider { border: none; border-top: 1px solid #e8e5dc; margin: 20px 0; }
+
+/* ── Info grid inside details tab ── */
+.fbo-grv-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.fbo-grv-info-item {
+  background: var(--cream-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+/* ── Sidebar meta rows ── */
+.fbo-grv-meta-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--navy);
+  padding: 8px 0;
+  border-bottom: 1px solid #f0eada;
+}
+.fbo-grv-meta-row:last-child { border-bottom: none; }
+.fbo-grv-meta-row span:first-child { color: var(--text-muted); font-size: 12px; }
+.fbo-grv-meta-row span:last-child { font-weight: 600; }
+
+/* ── Classification buttons ── */
+.fbo-grv-classify-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+
+.fbo-grv-classify-btn {
+  flex: 1;
+  padding: 11px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  border-radius: 10px;
+  border: 1.5px solid #d4cec4;
+  background: var(--white);
+  color: var(--navy);
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.fbo-grv-classify-btn:hover { border-color: var(--amber); }
+.fbo-grv-classify-btn--fake { color: #b91c1c; border-color: #fca5a5; background: #fef2f2; }
+.fbo-grv-classify-btn--fake:hover { border-color: #b91c1c; }
+.fbo-grv-classify-btn--active { border-color: var(--navy) !important; background: var(--navy) !important; color: var(--white) !important; }
+
+/* ── Evidence upload ── */
+.fbo-grv-evidence-upload {}
+
+.fbo-grv-evidence-drop {
+  border: 2px dashed #d4cec4;
+  border-radius: 12px;
+  padding: 28px 20px;
+  text-align: center;
+  background: var(--cream-2);
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.fbo-grv-evidence-drop:hover { border-color: var(--amber); }
+
+.fbo-grv-evidence-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--white);
+  border: 1.5px solid #e0ddd5;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+}
+.fbo-grv-evidence-icon { font-size: 20px; flex-shrink: 0; }
+.fbo-grv-evidence-name { font-size: 13.5px; font-weight: 600; color: var(--navy); margin-bottom: 2px; }
+.fbo-grv-evidence-note { font-size: 12px; color: var(--text-muted); margin-bottom: 2px; }
+.fbo-grv-evidence-date { font-size: 11px; color: var(--text-muted); }
+
+/* ── Responsive ── */
+@media (max-width: 860px) {
+  .fbo-grv-detail-header { padding: 20px; }
+  .fbo-grv-tracker { padding: 14px 20px; }
+  .fbo-grv-detail-layout { grid-template-columns: 1fr; padding: 16px 20px 60px; }
+  .fbo-grv-info-grid { grid-template-columns: 1fr; }
+}
+
 /* ============================================================
    P25 — Track Application
    ============================================================ */
@@ -569,9 +1056,91 @@
   text-transform: uppercase;
 }
 
-.track-badge--verified { background: #edfaf0; color: #3a9e60; }
-.track-badge--pending { background: #fff8ee; color: #b87a10; }
-.track-badge--missing { background: #fef2f2; color: #dc2626; }
+.track-badge--verified   { background: #edfaf0; color: #3a9e60; }
+.track-badge--pending    { background: #fff8ee; color: #b87a10; }
+.track-badge--missing    { background: #fef2f2; color: #dc2626; }
+.track-badge--scheduled  { background: #e8eef5; color: #355070; }
+
+/* ── Flag notification banner ──────────────────────────────── */
+.track-flag-notif {
+  display: flex;
+  gap: 14px;
+  background: #fff8ee;
+  border: 1.5px solid #f0a500;
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+
+.track-flag-notif__icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+
+.track-flag-notif__body { flex: 1; }
+
+.track-flag-notif__title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 4px;
+}
+
+.track-flag-notif__meta {
+  font-size: 12px;
+  color: #7a4a00;
+  text-transform: capitalize;
+  margin-bottom: 4px;
+}
+
+.track-flag-notif__msg {
+  font-size: 13px;
+  color: #5c3d0a;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.track-flag-notif__action {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.track-doc-item__sub {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.track-doc-upload {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px 8px 16px;
+  background: #f9f8f5;
+  border: 1.5px dashed #d6d2c8;
+  border-radius: 9px;
+  margin-top: -4px;
+}
+
+.track-doc-upload__btn {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--navy);
+  cursor: pointer;
+  padding: 5px 12px;
+  border-radius: 7px;
+  border: 1.5px solid var(--navy);
+  background: var(--white);
+  transition: background .15s;
+  white-space: nowrap;
+}
+.track-doc-upload__btn:hover { background: var(--cream); }
+
+.track-doc-upload__success {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--sage);
+}
 
 .track-placeholder-panel {
   background: var(--white);
@@ -585,12 +1154,129 @@
 .track-placeholder-panel .title { font-size: 17px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
 .track-placeholder-panel .sub { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
 
+/* ── FoSTaC Training tab ─────────────────────────────────────── */
+.track-fostac-card {
+  background: var(--white);
+  border: 1.5px solid #e0ddd5;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.track-fostac-header {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  padding: 24px;
+  border-bottom: 1px solid #e8e5dc;
+  background: var(--cream-2);
+}
+
+.track-fostac-icon { font-size: 36px; flex-shrink: 0; }
+
+.track-fostac-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 6px;
+}
+
+.track-fostac-sub {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.track-fostac-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-bottom: 1px solid #e8e5dc;
+}
+
+.track-fostac-meta-item {
+  padding: 16px 20px;
+  border-right: 1px solid #e8e5dc;
+}
+.track-fostac-meta-item:last-child { border-right: none; }
+
+.track-fostac-meta-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.track-fostac-meta-val {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.track-fostac-actions {
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 20px;
+  align-items: center;
+}
+
+.track-fostac-action-box {
+  padding: 20px;
+  background: var(--cream-2);
+  border: 1.5px solid #e8e5dc;
+  border-radius: 14px;
+  align-self: start;
+}
+
+.track-fostac-action-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 8px;
+}
+
+.track-fostac-action-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.track-fostac-btn {
+  font-size: 14px;
+  padding: 12px 22px;
+}
+
+.track-fostac-divider-or {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+
+.track-fostac-success-msg {
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #16a34a;
+  background: #edfaf0;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
 /* ── Responsive ────────────────────────────────────────────── */
 @media (max-width: 860px) {
   .fbo-portal-layout { grid-template-columns: 1fr; }
   .fbo-actions-grid { grid-template-columns: repeat(2, 1fr); }
   .track-header { padding: 20px; }
   .track-content { padding: 20px 20px 60px; }
+  .track-fostac-meta-grid { grid-template-columns: repeat(2, 1fr); }
+  .track-fostac-actions { grid-template-columns: 1fr; }
+  .track-fostac-divider-or { text-align: left; padding: 4px 0; }
 }
 @media (max-width: 560px) {
   .fbo-actions-grid { grid-template-columns: repeat(2, 1fr); }

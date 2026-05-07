@@ -1,0 +1,38 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users — own data only (FBO writes during registration)
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Applications — any authenticated user (FBO submits, officer reads)
+    match /applications/{appId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Officers — any authenticated user
+    match /officers/{uid} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Notifications — authenticated only
+    match /notifications/{notifId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Grievances — open read/write for prototype
+    // Consumers have no Firebase Auth so writes must be unauthenticated.
+    // Officers (authenticated) read all grievances and update status.
+    match /grievances/{grvId} {
+      allow read, write: if true;
+    }
+
+    // Consumers — open write so mock-OTP login can create profile without Firebase Auth.
+    // Read is also open so a consumer can look up their own profile.
+    match /consumers/{phone} {
+      allow read, write: if true;
+    }
+  }
+}

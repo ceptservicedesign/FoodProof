@@ -1,0 +1,70 @@
+{% extends "officer/_base.html" %}
+{% block title %}Clean Kitchen League — FOSCOS Officer Portal{% endblock %}
+{% block nav_ckl %}active{% endblock %}
+
+{% block content %}
+<div class="officer-page-header">
+  <div>
+    <h1 class="officer-page-title">⭐ Clean Kitchen League</h1>
+    <p class="officer-page-sub">Registered FBOs ranked by hygiene performance and consumer satisfaction</p>
+  </div>
+  <span class="officer-date-badge" id="cklDate"></span>
+</div>
+
+<!-- Leader card -->
+<div class="officer-card" id="cklLeaderCard" style="display:none;margin-bottom:24px;">
+  <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+    <div style="font-size:48px;flex-shrink:0;">🏆</div>
+    <div style="flex:1;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);margin-bottom:4px;">Current Leader</div>
+      <div style="font-size:22px;font-weight:700;color:var(--navy);" id="cklLeaderName">—</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-top:2px;" id="cklLeaderSub">—</div>
+    </div>
+    <div style="text-align:right;flex-shrink:0;">
+      <div style="font-size:36px;font-weight:700;color:var(--navy);" id="cklLeaderScore">—</div>
+      <div style="font-size:12px;color:var(--text-muted);">Score / 100</div>
+    </div>
+  </div>
+</div>
+
+<!-- Ranking table -->
+<div class="officer-card">
+  <div class="officer-card__header">
+    <h2 class="officer-card__title">FBO Rankings</h2>
+    <span id="cklCount" style="font-size:13px;color:var(--text-muted);"></span>
+  </div>
+  <div id="cklLoading" class="officer-table-wrap" style="padding:40px;text-align:center;color:var(--text-muted);">Computing scores…</div>
+  <div class="officer-table-wrap" id="cklTableWrap" style="display:none;">
+    <table class="officer-table">
+      <thead>
+        <tr>
+          <th style="width:48px;">#</th>
+          <th>Business</th>
+          <th>Avg Rating</th>
+          <th>Complaints</th>
+          <th>Resolved</th>
+          <th style="min-width:160px;">Score</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="cklTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Score methodology -->
+<div class="officer-card" style="margin-top:20px;padding:20px 24px;">
+  <div class="officer-card__header" style="margin-bottom:12px;">
+    <h2 class="officer-card__title" style="font-size:14px;">How Scores Are Calculated</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;font-size:13px;color:var(--text-muted);">
+    <div><strong style="color:var(--navy);display:block;margin-bottom:3px;">Consumer Ratings (50 pts)</strong>Average overall score across all filed grievances.</div>
+    <div><strong style="color:var(--navy);display:block;margin-bottom:3px;">Resolution Rate (30 pts)</strong>Percentage of complaints resolved by the FBO.</div>
+    <div><strong style="color:var(--navy);display:block;margin-bottom:3px;">Clean Record Bonus (20 pts)</strong>Full 20 pts for zero complaints; reduced proportionally.</div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/officer_clean_kitchen_league.js') }}"></script>
+{% endblock %}

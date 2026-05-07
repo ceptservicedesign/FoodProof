@@ -81,7 +81,23 @@
     });
   }
 
+  function applyDaysMode() {
+    var days = parseInt(sessionStorage.getItem('tlDays')) || 60;
+    if (days !== 30) return;
+
+    var titleEl  = $$('tcValidityTitle');
+    var descEl   = $$('tcValidityDesc');
+    var tc3Label = $$('tc3Label');
+    var tc3      = $$('tc3');
+
+    if (titleEl) titleEl.textContent = 'Valid for 30 Days Only';
+    if (descEl)  descEl.textContent  = 'This license is valid for 30 days from the date of issue. You must cease operations after expiry.';
+    if (tc3Label) tc3Label.style.display = 'none';
+    if (tc3) tc3.checked = true;
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
+    applyDaysMode();
     document.querySelectorAll('.tl-tc-check').forEach(function (box) {
       box.addEventListener('change', checkAllBoxes);
     });

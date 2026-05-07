@@ -59,8 +59,8 @@
       </div>
     </div>
 
-    <!-- What to do next -->
-    <div class="tl-card">
+    <!-- What to do next (60-day only) -->
+    <div class="tl-card" id="issuedComplianceCard">
       <div class="tl-question" style="margin-bottom:14px;">Complete within your validity period</div>
 
       <div class="tl-next-list">
@@ -97,11 +97,21 @@
           <div class="tl-next-item__arrow">›</div>
         </div>
       </div>
+      <a href="/temp-license/next-steps" style="display:block;text-align:center;margin-top:14px;font-size:13px;font-weight:600;color:var(--tl-navy,#1c2b4a);">View All Compliance Steps →</a>
+    </div>
+
+    <!-- Expand CTA (30-day only) -->
+    <div class="tl-card" id="issuedUpgradeCta" style="display:none;text-align:center;padding:24px;">
+      <div style="font-size:28px;margin-bottom:8px;">🚀</div>
+      <div style="font-size:15px;font-weight:700;color:var(--tl-navyDk);margin-bottom:6px;">Thinking to expand later?</div>
+      <div style="font-size:13px;color:var(--tl-gray);margin-bottom:14px;">When you're ready to scale up, apply for a permanent FSSAI license — no re-inspection needed when upgrading from a temporary license.</div>
+      <a href="/about-business" class="tl-btn-primary tl-btn-full">Apply for Permanent License →</a>
     </div>
 
     <div class="tl-btn-row">
-      <button class="tl-btn-ghost" id="downloadBtn">⬇ Download License</button>
-      <a href="/temp-license/next-steps" class="tl-btn-primary" style="text-align:center;">View Steps →</a>
+      <button class="tl-btn-ghost" id="downloadBtn">⬇ Download PDF</button>
+      <a href="/temp-license/next-steps" class="tl-btn-primary" style="text-align:center;" id="issuedViewStepsBtn">View Steps →</a>
+      <a href="/fbo-portal" class="tl-btn-primary" style="display:none;text-align:center;" id="issuedDashboardBtn">Go to Dashboard →</a>
     </div>
 
   </div>

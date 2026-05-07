@@ -15,7 +15,7 @@
   };
 
   var TIER_LABELS = {
-    'temporary-basic': 'Temporary / Basic Registration',
+    'temporary-basic': 'Temporary Registration',
     'basic':           'Basic Registration',
     'state':           'State License',
     'central':         'Central License'
@@ -37,7 +37,7 @@
 
   function getDaysPerWeek() {
     var el = document.getElementById('daysPerWeekInput');
-    return Math.min(7, Math.max(1, parseInt(el && el.value) || 6));
+    return Math.min(7, Math.max(1, parseInt(el && el.value) || 1));
   }
 
   function calcTurnover(daily, days, months) {
@@ -58,13 +58,19 @@
   }
 
   function updateResult() {
-    var daily  = parseFloat(document.getElementById('dailyRevenue').value) || 0;
-    var months = Math.min(12, Math.max(1, parseInt(document.getElementById('monthsPerYear').value) || 12));
-    var days   = getDaysPerWeek();
+    var daily    = parseFloat(document.getElementById('dailyRevenue').value) || 0;
+    var dwRaw    = parseInt(document.getElementById('daysPerWeekInput').value);
+    var myRaw    = parseInt(document.getElementById('monthsPerYear').value);
 
-    if (daily <= 0) {
+    var daysOk   = !isNaN(dwRaw) && dwRaw >= 1 && dwRaw <= 7;
+    var monthsOk = !isNaN(myRaw) && myRaw >= 1 && myRaw <= 12;
+
+    if (daily <= 0 || !daysOk || !monthsOk) {
       document.getElementById('turnoverAmount').textContent = '₹ —';
-      document.getElementById('turnoverLabel').textContent  = 'Enter your daily revenue to see your estimate';
+      var hint = 'Enter your daily revenue to see your estimate';
+      if (daily > 0 && !daysOk)   hint = 'Enter days per week (1–7) to see your estimate';
+      if (daily > 0 && !monthsOk) hint = 'Enter active months per year (1–12) to see your estimate';
+      document.getElementById('turnoverLabel').textContent  = hint;
       document.getElementById('tierBadge').style.display    = 'none';
       document.getElementById('tempPanel').style.display    = 'none';
       document.getElementById('tiersGlance').style.display  = 'none';
@@ -73,7 +79,7 @@
       return;
     }
 
-    var turnover = calcTurnover(daily, days, months);
+    var turnover = calcTurnover(daily, dwRaw, myRaw);
     var tier     = getTier(turnover);
     var panIndia = document.getElementById('panIndiaCheck');
     if (panIndia && panIndia.checked) tier = 'central';
@@ -116,7 +122,7 @@
     btn.textContent = 'Saving…';
 
     var panIndia = document.getElementById('panIndiaCheck').checked;
-    var months   = Math.min(12, Math.max(1, parseInt(document.getElementById('monthsPerYear').value) || 12));
+    var months   = Math.min(12, Math.max(1, parseInt(document.getElementById('monthsPerYear').value) || 1));
     var daily    = parseFloat(document.getElementById('dailyRevenue').value) || 0;
     var days     = getDaysPerWeek();
 
@@ -156,8 +162,8 @@
       var dw = document.getElementById('daysPerWeekInput');
       var pi = document.getElementById('panIndiaCheck');
       if (dr) dr.value = s.dailyRevenue || '';
-      if (my) my.value = s.monthsPerYear || 12;
-      if (dw) dw.value = s.daysPerWeek || 6;
+      if (my) my.value = s.monthsPerYear || '';
+      if (dw) dw.value = s.daysPerWeek || '';
       if (pi) pi.checked = s.panIndia || false;
       updateResult();
     });
@@ -176,8 +182,22 @@
     var dw = document.getElementById('daysPerWeekInput');
     var pi = document.getElementById('panIndiaCheck');
     if (dr) dr.addEventListener('input', updateResult);
-    if (my) my.addEventListener('input', updateResult);
-    if (dw) dw.addEventListener('input', updateResult);
+    if (my) {
+      my.addEventListener('input', updateResult);
+      my.addEventListener('blur', function () {
+        var v = parseInt(my.value);
+        if (!isNaN(v)) { if (v < 1) my.value = 1; if (v > 12) my.value = 12; }
+        updateResult();
+      });
+    }
+    if (dw) {
+      dw.addEventListener('input', updateResult);
+      dw.addEventListener('blur', function () {
+        var v = parseInt(dw.value);
+        if (!isNaN(v)) { if (v < 1) dw.value = 1; if (v > 7) dw.value = 7; }
+        updateResult();
+      });
+    }
     if (pi) pi.addEventListener('change', updateResult);
 
     var btn = document.getElementById('scaleContinueBtn');

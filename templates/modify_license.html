@@ -1,0 +1,110 @@
+{% extends "_base.html" %}
+{% block title %}Modify License — FOSCOS{% endblock %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/fbo_portal.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/registration.css') }}" />
+{% endblock %}
+
+{% block content %}
+<div class="fbo-page">
+
+  <!-- ── Loading ── -->
+  <div id="modifyLoading" style="display:flex;align-items:center;justify-content:center;min-height:60vh;">
+    <div style="text-align:center;color:var(--text-muted);">
+      <div style="font-size:28px;margin-bottom:12px;">⏳</div>
+      <div>Loading your details…</div>
+    </div>
+  </div>
+
+  <!-- ── Confirmation ── -->
+  <div id="modifyConfirm" style="display:none;text-align:center;padding:100px 40px;">
+    <div style="font-size:56px;margin-bottom:20px;">✅</div>
+    <h2 style="font-size:24px;font-weight:700;color:var(--navy);margin-bottom:12px;">License Modified</h2>
+    <p style="font-size:15px;color:var(--text-muted);max-width:440px;margin:0 auto 32px;line-height:1.7;">
+      Your business details and documents have been updated. FSSAI officers will review the changes.
+    </p>
+    <a href="/fbo-portal" class="fbo-btn-primary" style="text-decoration:none;display:inline-block;">← Return to Dashboard</a>
+  </div>
+
+  <!-- ── Edit form ── -->
+  <div id="modifyForm" style="display:none;">
+
+    <div class="fbo-header">
+      <div class="fbo-header__inner">
+        <div>
+          <a href="/fbo-portal" class="track-header__back">← Back to Dashboard</a>
+          <div class="fbo-header__greeting">Modify License</div>
+          <div class="fbo-header__sub">Update your business details and documents on record</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fbo-content" style="max-width:740px;margin:0 auto;padding-bottom:80px;">
+
+      <!-- Section 1: Business Details -->
+      <p class="fbo-section-title">Business &amp; Personal Details</p>
+      <div class="fbo-right-box" style="margin-bottom:24px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div>
+            <label class="reg-field-label" for="mlBizName">Business / Trade Name</label>
+            <input class="reg-input" type="text" id="mlBizName" placeholder="e.g. Sharma's Dhaba" autocomplete="organization" />
+          </div>
+          <div>
+            <label class="reg-field-label" for="mlOwnerName">Owner / Proprietor Name</label>
+            <input class="reg-input" type="text" id="mlOwnerName" placeholder="Full legal name" autocomplete="name" />
+          </div>
+        </div>
+        <div style="margin-top:14px;">
+          <label class="reg-field-label" for="mlBizPhone">Business Contact Number</label>
+          <div class="reg-number-wrap" style="max-width:300px;">
+            <div class="reg-number-wrap__prefix">+91</div>
+            <input type="tel" id="mlBizPhone" placeholder="10-digit number" maxlength="10" inputmode="numeric" />
+          </div>
+        </div>
+
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+          <p class="reg-field-label" style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:14px;">Premises Address</p>
+          <label class="reg-field-label" for="mlAddrLine1">Street Address / Plot No.</label>
+          <input class="reg-input" type="text" id="mlAddrLine1" placeholder="Shop no., building, street" autocomplete="address-line1" />
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px;">
+            <div>
+              <label class="reg-field-label" for="mlPincode">Pincode</label>
+              <input class="reg-input" type="text" id="mlPincode" placeholder="6-digit pincode" maxlength="6" inputmode="numeric" />
+            </div>
+            <div>
+              <label class="reg-field-label" for="mlDistrict">District</label>
+              <input class="reg-input" type="text" id="mlDistrict" placeholder="e.g. South Delhi" />
+            </div>
+          </div>
+          <div style="margin-top:10px;">
+            <label class="reg-field-label" for="mlState">State / UT</label>
+            <input class="reg-input" type="text" id="mlState" placeholder="e.g. Delhi" style="max-width:300px;" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Documents -->
+      <p class="fbo-section-title">Documents</p>
+      <div class="fbo-right-box" style="margin-bottom:24px;">
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;line-height:1.6;">
+          Re-upload documents if any have changed. Uploads are reviewed by FSSAI officers and are not visible to consumers.
+        </p>
+        <div id="mlDocList"></div>
+      </div>
+
+      <!-- Actions -->
+      <p class="reg-error" id="mlError" style="margin-bottom:12px;display:block;"></p>
+      <div style="display:flex;gap:14px;align-items:center;">
+        <button class="reg-btn-cta" id="mlSaveBtn" style="width:auto;padding:14px 40px;font-size:15px;">Save Changes</button>
+        <a href="/fbo-portal" style="font-size:14px;color:var(--text-muted);text-decoration:none;">Cancel</a>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/modify_license.js') }}"></script>
+{% endblock %}

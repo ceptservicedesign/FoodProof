@@ -1,0 +1,72 @@
+{% extends "officer/_base.html" %}
+{% block title %}FBO Profile — FOSCOS Officer Portal{% endblock %}
+{% block nav_fbo_directory %}active{% endblock %}
+
+{% block content %}
+
+<div class="officer-detail-header">
+  <div class="officer-detail-header__meta">
+    <div class="biz-name" id="profileBizName">Loading…</div>
+    <div class="biz-sub" id="profileAppId">—</div>
+  </div>
+  <div class="officer-detail-actions">
+    <a href="/officer/fbo-directory" class="officer-btn-return" style="text-decoration:none;">← FBO Directory</a>
+  </div>
+</div>
+
+<div class="officer-detail-layout">
+
+  <!-- Left: Tabs -->
+  <div class="officer-card officer-detail-tabs-card">
+    <div class="officer-tabs" id="profileTabs">
+      <button class="officer-tab active" data-tab="license">License Info</button>
+      <button class="officer-tab" data-tab="grievances">Grievances <span class="officer-grv-tab-count" id="profileGrvCount" style="display:none;"></span></button>
+      <button class="officer-tab" data-tab="inspections">Inspections</button>
+    </div>
+
+    <div class="officer-tab-panel active" id="tabLicense">
+      <div class="officer-info-grid" id="licenseGrid">
+        <div class="officer-info-loading">Loading…</div>
+      </div>
+    </div>
+
+    <div class="officer-tab-panel" id="tabGrievances">
+      <div id="profileGrvList">
+        <div class="officer-info-loading">Loading grievances…</div>
+      </div>
+    </div>
+
+    <div class="officer-tab-panel" id="tabInspections">
+      <p class="officer-actions-card__title" style="margin-bottom:12px;">Regulatory Inspections</p>
+      <p style="font-size:11.5px;color:var(--text-muted);margin-bottom:12px;">Conducted before license was issued.</p>
+      <div id="profileRegulatoryInspections"><div class="officer-info-loading">Loading…</div></div>
+
+      <div style="border-top:1px solid var(--border);margin:24px 0;"></div>
+
+      <p class="officer-actions-card__title" style="margin-bottom:12px;">Surveillance Inspections</p>
+      <p style="font-size:11.5px;color:var(--text-muted);margin-bottom:12px;">Triggered by consumer grievances.</p>
+      <div id="profileSurveillanceInspections"><div class="officer-info-loading">Loading…</div></div>
+    </div>
+  </div>
+
+  <!-- Right: Status sidebar -->
+  <div class="officer-detail-actions-col">
+    <div class="officer-card officer-status-card">
+      <h3 class="officer-actions-card__title">License Status</h3>
+      <div class="officer-status-badge-lg" id="profileStatusBadge">Active</div>
+      <div class="officer-meta-row"><span>License No.</span><span id="metaLicenseNo">—</span></div>
+      <div class="officer-meta-row"><span>Tier</span><span id="metaTier">—</span></div>
+      <div class="officer-meta-row"><span>Valid Until</span><span id="metaValidUntil">—</span></div>
+      <div class="officer-meta-row"><span>District</span><span id="metaDistrict">—</span></div>
+      <div class="officer-meta-row"><span>Open Grievances</span><span id="metaGrvCount">—</span></div>
+    </div>
+  </div>
+
+</div>
+
+<script>window.__FBO_ID__ = {{ fbo_id | tojson }};</script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/officer_fbo_profile.js') }}"></script>
+{% endblock %}

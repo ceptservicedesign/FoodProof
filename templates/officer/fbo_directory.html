@@ -1,0 +1,43 @@
+{% extends "officer/_base.html" %}
+{% block title %}FBO Directory — FOSCOS Officer Portal{% endblock %}
+{% block nav_fbo_directory %}active{% endblock %}
+
+{% block content %}
+<div class="officer-page-header">
+  <div>
+    <h1 class="officer-page-title">FBO Directory</h1>
+    <p class="officer-page-sub">All registered food businesses with active licenses</p>
+  </div>
+  <div class="officer-header-actions">
+    <input class="officer-search-input" type="text" id="fboSearch" placeholder="Search by name, license ID, or address…" style="width:280px;" />
+  </div>
+</div>
+
+<div class="officer-card">
+  <div class="officer-table-wrap">
+    <table class="officer-table" id="fboTable">
+      <thead>
+        <tr>
+          <th>License No.</th>
+          <th>Business Name</th>
+          <th>Tier</th>
+          <th>District</th>
+          <th>Valid Until</th>
+          <th>Grievances</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="fboTableBody">
+        <tr><td colspan="7" class="officer-table__empty">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="officer-table-footer">
+    <span id="fboCount" class="officer-table-count"></span>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/officer_fbo_directory.js') }}"></script>
+{% endblock %}
