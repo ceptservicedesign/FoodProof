@@ -26,13 +26,13 @@
   };
 
   var DOC_NAMES = {
-    selfie:          'Photo of Applicant',
     idProof:         'Identity Proof',
     addressProof:    'Address Proof',
     form9:           'Form IX',
     blueprint:       'Premises Blueprint',
     waterTestReport: 'Water Analysis Report',
-    nocFireDept:     'NOC from Fire Department'
+    nocFireDept:     'NOC from Fire Department',
+    medicalCert:     'Medical Certificate'
   };
 
   var PIPELINE_ORDER = [
@@ -140,6 +140,7 @@
     if (tier !== 'temporary-basic') required.push('idProof', 'addressProof', 'waterTestReport');
     if (tier === 'state' || tier === 'central') required.push('form9', 'blueprint');
     if (tier === 'central') required.push('nocFireDept');
+    if (docs.medicalCert) required.push('medicalCert');
 
     list.innerHTML = required.map(function (key) {
       var val     = docs[key];

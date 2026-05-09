@@ -21,8 +21,12 @@
     form9:           'Form IX',
     blueprint:       'Premises Blueprint',
     waterTestReport: 'Water Analysis Report',
-    nocFireDept:     'NOC from Fire Department'
+    nocFireDept:     'NOC from Fire Department',
+    medicalCert:     'Medical Certificate'
   };
+
+  var currentUid   = null;
+  var currentAppId = null;
 
   // ── Tab switching ─────────────────────────────────────────────
   function setupTabs() {
@@ -56,7 +60,8 @@
             (ts ? ' &middot; ' + ts : '') + '</div>' +
           (f.priority ? '<div class="track-flag-notif__meta">Priority: ' + f.priority + '</div>' : '') +
           (f.note ? '<div class="track-flag-notif__msg">' + f.note + '</div>' : '') +
-          '<div class="track-flag-notif__action">Please review your application. If you need to provide additional information, use the Update &amp; Resubmit option below or contact your FSSAI officer.</div>' +
+          '<div class="track-flag-notif__action">Please review your documents and resubmit. Upload updated files in the Document Processing tab or use the button below.</div>' +
+          '<a href="/modify-license" class="fbo-btn-primary" style="display:inline-block;margin-top:10px;font-size:13px;padding:9px 20px;text-decoration:none;">Modify &amp; Resubmit &#8594;</a>' +
         '</div>' +
         '</div>';
     }).join('');
@@ -129,29 +134,61 @@
     input.accept = 'image/*,.pdf';
     input.style.display = 'none';
 
-    var successEl = document.createElement('span');
-    successEl.className     = 'track-doc-upload__success';
-    successEl.style.display = 'none';
-    successEl.textContent   = '✓ Uploaded successfully';
+    var statusEl = document.createElement('span');
+    statusEl.className     = 'track-doc-upload__success';
+    statusEl.style.display = 'none';
 
     btn.addEventListener('click', function () { input.click(); });
 
-    (function (sEl) {
-      input.addEventListener('change', function () {
-        if (!input.files[0]) return;
-        sEl.style.display = '';
-        var user = firebase.auth().currentUser;
-        if (!user) return;
-        var update = { documents: {} };
-        update.documents[docKey] = true;
-        firebase.firestore().collection('users').doc(user.uid)
-          .set(update, { merge: true }).catch(function () {});
+    input.addEventListener('change', function () {
+      var file = input.files[0];
+      if (!file || !currentUid || !currentAppId) return;
+
+      btn.textContent = '⏳ Uploading…';
+      statusEl.style.display = 'none';
+
+      var path = 'documents/' + currentUid + '/' + docKey + '_' + Date.now();
+      var ref  = firebase.storage().ref(path);
+
+      ref.put(file).then(function () {
+        return ref.getDownloadURL();
+      }).then(function (url) {
+        var ts    = firebase.firestore.FieldValue.serverTimestamp();
+        var patch = {};
+        patch['documents.' + docKey] = url;
+        patch['updatedAt'] = ts;
+
+        var auditEntry = {
+          action:    'Document uploaded by FBO: ' + (DOC_NAMES[docKey] || docKey),
+          by:        'fbo',
+          statusKey: 'documents_requested',
+          timestamp: new Date().toISOString()
+        };
+
+        var db    = firebase.firestore();
+        var batch = db.batch();
+        batch.set(db.collection('users').doc(currentUid), patch, { merge: true });
+        batch.update(db.collection('applications').doc(currentAppId), Object.assign({}, patch, {
+          auditTrail: firebase.firestore.FieldValue.arrayUnion(auditEntry)
+        }));
+        return batch.commit();
+      }).then(function () {
+        btn.textContent        = '✓ Re-upload';
+        statusEl.style.display = '';
+        statusEl.style.color   = '';
+        statusEl.textContent   = '✓ ' + file.name + ' saved';
+      }).catch(function (err) {
+        console.error('[track-application] upload ' + docKey + ':', err);
+        btn.textContent        = '⬆ Upload';
+        statusEl.style.display = '';
+        statusEl.style.color   = '#b91c1c';
+        statusEl.textContent   = 'Upload failed — please try again';
       });
-    })(successEl);
+    });
 
     wrap.appendChild(btn);
     wrap.appendChild(input);
-    wrap.appendChild(successEl);
+    wrap.appendChild(statusEl);
     return wrap;
   }
 
@@ -265,10 +302,12 @@
 
   // ── Load data from Firestore ──────────────────────────────────
   function loadTrackData(user) {
+    currentUid = user.uid;
     firebase.firestore().collection('users').doc(user.uid).get().then(function (doc) {
       if (!doc.exists) { window.location.href = '/fbo-portal'; return; }
       var d   = doc.data();
       var appId = d.applicationId;
+      currentAppId = appId || null;
 
       if (!appId) { window.location.href = '/fbo-portal'; return; }
 

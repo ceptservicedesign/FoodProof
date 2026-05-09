@@ -2,7 +2,6 @@
   'use strict';
 
   var DOC_LABELS = {
-    selfie:          'Photo of Applicant',
     idProof:         'Identity Proof',
     addressProof:    'Address Proof',
     form9:           'Form IX',
@@ -26,9 +25,9 @@
   }
 
   function getRequiredDocs(tier) {
-    var required = ['selfie'];
-    if (tier !== 'temporary-basic') required.push('idProof', 'addressProof');
-    if (tier === 'state' || tier === 'central') required.push('form9', 'blueprint', 'waterTestReport');
+    var required = [];
+    if (tier !== 'temporary-basic') required.push('idProof', 'addressProof', 'waterTestReport');
+    if (tier === 'state' || tier === 'central') required.push('form9', 'blueprint');
     if (tier === 'central') required.push('nocFireDept');
     return required;
   }
@@ -44,45 +43,61 @@
       var present     = !!(docs && docs[key]);
       var statusColor = present ? '#16a34a' : '#b45309';
       var statusText  = present ? 'Uploaded' : 'Not uploaded';
-      var btnText     = present ? 'Re-upload' : 'Upload';
+      var btnText     = present ? '✓ Re-upload' : '⬆ Upload';
       return '<div style="display:flex;align-items:center;justify-content:space-between;' +
-             'padding:13px 0;border-bottom:1px solid var(--border);">' +
+             'padding:13px 0;border-bottom:1px solid var(--border);" id="mlDocRow-' + key + '">' +
         '<div style="display:flex;align-items:center;gap:12px;">' +
-          '<span style="font-size:20px;flex-shrink:0;">' + (present ? '✅' : '○') + '</span>' +
+          '<span style="font-size:20px;flex-shrink:0;" id="mlDocIcon-' + key + '">' + (present ? '✅' : '○') + '</span>' +
           '<div>' +
-            '<div style="font-size:13.5px;font-weight:600;color:var(--navy);">' +
-              (DOC_LABELS[key] || key) +
-            '</div>' +
-            '<div style="font-size:12px;color:' + statusColor + ';margin-top:2px;">' +
-              statusText +
+            '<div style="font-size:13.5px;font-weight:600;color:var(--navy);">' + (DOC_LABELS[key] || key) + '</div>' +
+            '<div style="font-size:12px;margin-top:2px;" id="mlDocStatus-' + key + '">' +
+              '<span style="color:' + statusColor + ';">' + statusText + '</span>' +
             '</div>' +
           '</div>' +
         '</div>' +
-        '<button class="fbo-btn-secondary" data-dockey="' + key + '" ' +
-          'style="font-size:12px;padding:6px 16px;cursor:pointer;">' +
-          btnText +
-        '</button>' +
+        '<label class="fbo-btn-secondary" id="mlDocLabel-' + key + '" style="font-size:12px;padding:6px 16px;cursor:pointer;">' +
+          '<span id="mlDocLabelSpan-' + key + '">' + btnText + '</span>' +
+          '<input type="file" accept="image/*,.pdf" data-dockey="' + key + '" style="display:none;" />' +
+        '</label>' +
       '</div>';
     }).join('');
 
-    listEl.querySelectorAll('[data-dockey]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var key = btn.getAttribute('data-dockey');
-        btn.disabled    = true;
-        btn.textContent = 'Uploading…';
-        var patch = {};
-        patch['documents.' + key] = true;
-        firebase.firestore().collection('users').doc(uid).update(patch)
-          .then(function () {
-            if (!userData.documents) userData.documents = {};
-            userData.documents[key] = true;
-            renderDocs(userData.documents, userData.scale && userData.scale.tier);
-          })
-          .catch(function (err) {
-            console.error('[modify-license] doc upload:', err);
-            btn.disabled    = false;
-            btn.textContent = 'Upload';
-          });
+    listEl.querySelectorAll('input[data-dockey]').forEach(function (input) {
+      input.addEventListener('change', function () {
+        var key  = input.getAttribute('data-dockey');
+        var file = input.files[0];
+        if (!file) return;
+
+        var labelSpan = document.getElementById('mlDocLabelSpan-' + key);
+        var statusEl  = document.getElementById('mlDocStatus-'    + key);
+        if (labelSpan) labelSpan.textContent = '⏳ Uploading…';
+
+        var path = 'documents/' + uid + '/' + key + '_' + Date.now();
+        var ref  = firebase.storage().ref(path);
+
+        ref.put(file).then(function () {
+          return ref.getDownloadURL();
+        }).then(function (url) {
+          if (!userData.documents) userData.documents = {};
+          userData.documents[key] = url;
+
+          var patch = {};
+          patch['documents.' + key] = url;
+          patch['updatedAt'] = firebase.firestore.FieldValue.serverTimestamp();
+
+          var db    = firebase.firestore();
+          var batch = db.batch();
+          batch.update(db.collection('users').doc(uid), patch);
+          if (appId) {
+            batch.set(db.collection('applications').doc(appId), patch, { merge: true });
+          }
+          return batch.commit();
+        }).then(function () {
+          renderDocs(userData.documents, userData.scale && userData.scale.tier);
+        }).catch(function (err) {
+          console.error('[modify-license] doc upload:', err);
+          renderDocs(userData.documents, userData.scale && userData.scale.tier);
+        });
       });
     });
   }
@@ -136,7 +151,8 @@
         var appRef  = db.collection('applications').doc(appId);
         var userRef = db.collection('users').doc(uid);
         batch.set(appRef,
-          { details: detailsUpdate, applicationStatus: 'submitted', updatedAt: ts,
+          { details: detailsUpdate, documents: userData.documents || {},
+            applicationStatus: 'submitted', updatedAt: ts,
             auditTrail: firebase.firestore.FieldValue.arrayUnion(auditEntry) },
           { merge: true });
         batch.set(userRef, { applicationStatus: 'submitted', updatedAt: ts }, { merge: true });

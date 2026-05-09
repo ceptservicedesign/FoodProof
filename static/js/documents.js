@@ -9,17 +9,6 @@
   var uploadedDocs = {};  // key → URL string (or true for legacy boolean)
 
   var DOC_SPECS = {
-    selfie: {
-      icon: '🤳', title: 'Photo of Applicant',
-      desc: 'Passport-style photo or selfie.',
-      required: true,
-      tiers: ['state', 'central'],
-      expandContent: {
-        detail: 'A recent, clear photo of the applicant — passport-style or a selfie against a plain background. JPG or PNG, max 5 MB.',
-        guidance: 'Take the photo in good lighting. Your full face must be clearly visible — no sunglasses, caps, or face coverings. A standard phone camera is perfectly acceptable; no professional photography is required.',
-        buttons: [{ type: 'guide', label: 'Watch a Guide' }]
-      }
-    },
     idProof: {
       icon: '🪪', title: 'Photo ID Proof',
       desc: 'Aadhaar, PAN, Passport, Voter ID, or Driving Licence.',
