@@ -12,24 +12,21 @@
     return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
-  function score(fboGrievances) {
+  function score(fboGrievances, fssaiRating) {
+    var baseRating = typeof fssaiRating === 'number' ? fssaiRating : 5;
     var total = fboGrievances.length;
-    if (total === 0) return { score: 100, avgRating: 5, resolved: 0, total: 0 };
+    if (total === 0) {
+      var s0 = Math.min(100, Math.round((baseRating / 5) * 50 + 20));
+      return { score: s0, avgRating: baseRating.toFixed(1), resolved: 0, total: 0 };
+    }
 
-    var resolved = fboGrievances.filter(function (g) { return g.status === 'Resolved'; }).length;
-    var ratings  = fboGrievances
-      .map(function (g) { return parseFloat(g.overall) || 0; })
-      .filter(function (r) { return r > 0; });
-    var avgRating = ratings.length
-      ? ratings.reduce(function (s, r) { return s + r; }, 0) / ratings.length
-      : 5;
+    var resolved    = fboGrievances.filter(function (g) { return g.status === 'Resolved'; }).length;
+    var ratingPts   = (baseRating / 5) * 50;
+    var resolvedPts = (resolved / total) * 30;
+    var cleanBonus  = Math.max(0, 20 - total * 4);
+    var total_score = Math.min(100, Math.round(ratingPts + resolvedPts + cleanBonus));
 
-    var ratingPts    = (avgRating / 5) * 50;
-    var resolvedPts  = (resolved / total) * 30;
-    var cleanBonus   = Math.max(0, 20 - total * 4);
-    var total_score  = Math.min(100, Math.round(ratingPts + resolvedPts + cleanBonus));
-
-    return { score: total_score, avgRating: avgRating.toFixed(1), resolved: resolved, total: total };
+    return { score: total_score, avgRating: baseRating.toFixed(1), resolved: resolved, total: total };
   }
 
   function badge(s) {
@@ -42,7 +39,7 @@
   function render(fbos, grievances) {
     var ranked = fbos.map(function (fbo) {
       var fboGrvs = grievances.filter(function (g) { return g.restaurantId === fbo.appId; });
-      var s = score(fboGrvs);
+      var s = score(fboGrvs, fbo.fssaiRating);
       return Object.assign({}, fbo, s);
     }).sort(function (a, b) { return b.score - a.score; });
 
@@ -106,9 +103,10 @@
         fbos = snap.docs.map(function (d) {
           var data = d.data();
           return {
-            appId:   data.appId || d.id,
-            bizName: (data.details && data.details.bizName) || data.displayName || '—',
-            tier:    data.scale && data.scale.tier
+            appId:       data.appId || d.id,
+            bizName:     (data.details && data.details.bizName) || data.displayName || '—',
+            tier:        data.scale && data.scale.tier,
+            fssaiRating: typeof data.fssaiRating === 'number' ? data.fssaiRating : null,
           };
         });
         return firebase.firestore().collection('grievances').get();

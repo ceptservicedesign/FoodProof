@@ -53,6 +53,7 @@ AUTH_USERS = [
     ('seed_uid_008', '9863010008', 'Jadoh House Owner'),
     ('seed_uid_009', '9863010009', 'Bread Cafe Owner'),
     ('seed_uid_010', '9863010010', 'Cafe 17 Owner'),
+    ('seed_uid_011', '9863010011', "Priya's Kitchen Owner"),
 ]
 
 
@@ -862,6 +863,76 @@ RESTAURANTS = [
             audit('Application approved', 'officer',
                   'approved',
                   when=dt(2026, 4, 20)),
+        ],
+    },
+
+    # ── 11. Priya's Kitchen ───────────────────────────────────────────────────
+    {
+        'appId':       'FSSAI-2026-10011',
+        'uid':         'seed_uid_011',
+        'phone':       '9863010011',
+        'displayName': 'Priya Kharmawlong',
+
+        'businessTypes': ['restaurant-cafe', 'home-kitchen'],
+        'foodTypes':     ['ready-to-eat', 'cereals', 'dairy-analogues', 'beverages'],
+
+        'scale': {
+            'dailyRevenue':  7000,
+            'daysPerWeek':   6,
+            'monthsPerYear': 12,
+            'turnover':      2167200,    # 7000 × 6 × 4.3 × 12
+            'tier':          'basic',
+            'fee':           100,
+            'panIndia':      False,
+        },
+        'details': {
+            'bizName':      "Priya's Kitchen",
+            'ownerName':    'Priya Kharmawlong',
+            'bizPhone':     '9863010011',
+            'addrLine1':    'Rilbong, Lapalang Road',
+            'addrLine2':    '',
+            'addrDistrict': 'East Khasi Hills',
+            'addrState':    'Meghalaya',
+            'addrPincode':  '793004',
+        },
+        'documents': {
+            'selfie': True, 'idProof': True, 'addressProof': True,
+        },
+        'ossCart': {
+            'items': [
+                {'id': 'medical-cert', 'name': 'Medical Certificate (Staff)', 'price': 299, 'qty': 1, 'type': 'health'},
+            ],
+            'total': 299,
+        },
+
+        'tier':          'basic',
+        'fee':           100,
+        'years':         1,
+        'paymentMethod': 'upi',
+
+        'applicationStatus': 'approved',
+        'fssaiRating':       3.9,
+        'grievances':        [],
+
+        'submittedAt': dt(2026, 3, 8),
+        'updatedAt':   dt(2026, 4, 30),
+        'review': {'years': 1, 'totalFee': 100},
+
+        'auditTrail': [
+            audit('Application submitted', 'citizen', when=dt(2026, 3, 8)),
+            audit('Application advanced to next stage', 'officer',
+                  'inspection_scheduled',
+                  when=dt(2026, 3, 25)),
+            audit('Application advanced to next stage', 'officer',
+                  'inspection_complete',
+                  note='Home kitchen setup meets basic hygiene norms.',
+                  when=dt(2026, 4, 10)),
+            audit('Application advanced to next stage', 'officer',
+                  'final_review',
+                  when=dt(2026, 4, 22)),
+            audit('Application approved', 'officer',
+                  'approved',
+                  when=dt(2026, 4, 30)),
         ],
     },
 ]
